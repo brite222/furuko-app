@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FUKURO — Leaderboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #060608; --surface: #0e0e14; --card: #13131c; --card2: #181824;
+      --border: rgba(255,255,255,0.07); --accent: #c8f542; --accent2: #42f5c8;
+      --accent3: #f542a4; --text: #f0f0f8; --muted: #5a5a72; --muted2: #8888aa;
+      --font-display: 'Bebas Neue', sans-serif; --font-body: 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; overflow-x: hidden; }
+    .bg-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(200,245,66,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(200,245,66,0.03) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; z-index: 0; }
+    .bg-glow { position: fixed; top: -300px; left: 50%; transform: translateX(-50%); width: 900px; height: 600px; background: radial-gradient(ellipse, rgba(200,245,66,0.06) 0%, transparent 65%); pointer-events: none; z-index: 0; }
+    .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; position: relative; z-index: 1; }
+    .sidebar { grid-row: 1 / -1; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 32px 0; position: sticky; top: 0; height: 100vh; }
+    .logo { padding: 0 24px 32px; border-bottom: 1px solid var(--border); }
+    .logo-text { font-family: var(--font-display); font-size: 36px; letter-spacing: 4px; color: var(--accent); line-height: 1; }
+    .logo-sub { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
+    .nav { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+    .nav-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; padding: 0 8px; margin: 12px 0 6px; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; color: var(--muted2); font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; border: 1px solid transparent; }
+    .nav-item:hover { color: var(--text); background: var(--card); }
+    .nav-item.active { color: var(--accent); background: rgba(200,245,66,0.08); border-color: rgba(200,245,66,0.15); }
+    .nav-item .icon { width: 18px; text-align: center; font-size: 16px; }
+    .nav-item .badge { margin-left: auto; background: var(--accent3); color: #000; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; font-family: var(--font-mono); }
+    .sidebar-bottom { padding: 16px; border-top: 1px solid var(--border); }
+    .user-chip { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--card); border-radius: 10px; border: 1px solid var(--border); }
+    .avatar { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #000; flex-shrink: 0; }
+    .user-info { flex: 1; min-width: 0; }
+    .user-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-email { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .logout-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; transition: color 0.2s; }
+    .logout-btn:hover { color: #fa6d6d; }
+    .content { padding: 32px; overflow-y: auto; }
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+    .page-title { font-family: var(--font-display); font-size: 40px; letter-spacing: 3px; }
+    .live-badge { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted2); font-family: var(--font-mono); background: var(--card); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border); }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); } }
+
+    /* TOP 3 PODIUM */
+    .podium { display: flex; align-items: flex-end; justify-content: center; gap: 16px; margin-bottom: 40px; }
+    .podium-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .podium-avatar { border-radius: 16px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-weight: 700; color: #000; font-family: var(--font-display); letter-spacing: 1px; }
+    .podium-item:nth-child(1) .podium-avatar { width: 56px; height: 56px; font-size: 22px; }
+    .podium-item:nth-child(2) .podium-avatar { width: 72px; height: 72px; font-size: 28px; background: linear-gradient(135deg, #ffd700, #ffaa00); }
+    .podium-item:nth-child(3) .podium-avatar { width: 56px; height: 56px; font-size: 22px; background: linear-gradient(135deg, var(--accent2), #00aaff); }
+    .podium-name { font-size: 13px; font-weight: 600; color: var(--text); }
+    .podium-pts { font-family: var(--font-mono); font-size: 12px; color: var(--accent); }
+    .podium-rank { font-family: var(--font-display); font-size: 18px; color: var(--muted); }
+    .podium-item:nth-child(2) .podium-rank { color: #ffd700; font-size: 24px; }
+    .podium-base { border-radius: 12px 12px 0 0; width: 100%; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 28px; }
+    .podium-item:nth-child(1) .podium-base { height: 60px; background: rgba(66,245,200,0.1); border: 1px solid rgba(66,245,200,0.2); color: var(--accent2); }
+    .podium-item:nth-child(2) .podium-base { height: 90px; background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.2); color: #ffd700; }
+    .podium-item:nth-child(3) .podium-base { height: 50px; background: rgba(200,245,66,0.1); border: 1px solid rgba(200,245,66,0.2); color: var(--accent); }
+    .podium-wrap { width: 120px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+
+    /* FULL LIST */
+    .lb-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .lb-card-header { display: flex; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border); gap: 12px; }
+    .lb-col { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    .lb-col.rank  { width: 48px; }
+    .lb-col.name  { flex: 1; }
+    .lb-col.pts   { width: 100px; text-align: right; }
+    .lb-row { display: flex; align-items: center; padding: 14px 20px; gap: 12px; border-bottom: 1px solid var(--border); transition: background 0.2s; }
+    .lb-row:last-child { border-bottom: none; }
+    .lb-row:hover { background: var(--card2); }
+    .lb-row.you { background: rgba(200,245,66,0.05); border-left: 3px solid var(--accent); }
+    .lb-row.top1 { background: rgba(255,215,0,0.05); }
+    .lb-row.top2 { background: rgba(192,192,192,0.05); }
+    .lb-row.top3 { background: rgba(205,127,50,0.05); }
+    .rank-num { width: 48px; font-family: var(--font-display); font-size: 22px; color: var(--muted); text-align: center; }
+    .lb-row.top1 .rank-num { color: #ffd700; }
+    .lb-row.top2 .rank-num { color: #c0c0c0; }
+    .lb-row.top3 .rank-num { color: #cd7f32; }
+    .lb-avatar { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #000; flex-shrink: 0; }
+    .lb-name { flex: 1; }
+    .lb-username { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .you-tag { font-family: var(--font-mono); font-size: 10px; color: var(--accent); background: rgba(200,245,66,0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(200,245,66,0.2); }
+    .lb-pts-val { width: 100px; text-align: right; font-family: var(--font-mono); font-size: 14px; font-weight: 500; color: var(--text); }
+
+    .loading-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; transition: opacity 0.5s, visibility 0.5s; }
+    .loading-overlay.hidden { opacity: 0; visibility: hidden; }
+    .loading-logo { font-family: var(--font-display); font-size: 64px; letter-spacing: 8px; color: var(--accent); animation: flicker 1.5s ease infinite; }
+    @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .loading-bar-wrap { width: 200px; height: 2px; background: var(--border); border-radius: 2px; margin-top: 24px; overflow: hidden; }
+    .loading-bar { height: 100%; background: var(--accent); border-radius: 2px; animation: loadBar 1.5s ease forwards; }
+    @keyframes loadBar { from { width: 0; } to { width: 100%; } }
+    .empty { text-align: center; padding: 48px; color: var(--muted); font-size: 14px; }
+
+    @media (max-width: 768px) { .app { grid-template-columns: 1fr; } .sidebar { display: none; } .content { padding: 16px; } }
+  </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loader">
+  <div class="loading-logo">FUKURO</div>
+  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+</div>
+
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-text">FUKURO</div>
+      <div class="logo-sub">Ecosystem Dashboard</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-label">Main</div>
+      <a class="nav-item" href="dashboard.html"><span class="icon">⚡</span> Dashboard</a>
+      <a class="nav-item active" href="leaderboard.html"><span class="icon">🏆</span> Leaderboard <span class="badge">LIVE</span></a>
+      <a class="nav-item" href="dashboard.html#wallet"><span class="icon">💼</span> Wallet</a>
+      <div class="nav-label">Activity</div>
+     <a class="nav-item" href="tasks.html"><span class="icon">✅</span> Tasks</a>
+      <a class="nav-item" href="points-history.html"><span class="icon">📈</span> Points History</a>
+      <div class="nav-label">Account</div>
+     <a class="nav-item" href="profile.html"><span class="icon">👤</span> Profile</a>
+      <a class="nav-item" href="settings.html"><span class="icon">⚙️</span> Settings</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-chip">
+        <div class="avatar" id="sidebarAvatar">?</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebarName">Loading...</div>
+          <div class="user-email" id="sidebarEmail">—</div>
+        </div>
+        <button class="logout-btn" onclick="logout()" title="Logout">⏻</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="content">
+    <div class="page-header">
+      <div class="page-title">LEADERBOARD</div>
+      <div class="live-badge"><div class="dot"></div> LIVE</div>
+    </div>
+
+    <!-- TOP 3 PODIUM -->
+    <div class="podium" id="podium"></div>
+
+    <!-- FULL LIST -->
+    <div class="lb-card">
+      <div class="lb-card-header">
+        <div class="lb-col rank">Rank</div>
+        <div style="width:36px"></div>
+        <div class="lb-col name">Player</div>
+        <div class="lb-col pts">Points</div>
+      </div>
+      <div id="lbFull"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = "http://127.0.0.1:5000/api";
+  const token = localStorage.getItem("token");
+
+  window.onload = async () => {
+    setTimeout(() => document.getElementById("loader").classList.add("hidden"), 1500);
+    if (!token) { window.location.href = "login.html"; return; }
+
+    try {
+      // Load profile
+      const pRes = await fetch(`${API}/protected/profile`, {
+        headers: { "Authorization": "Bearer " + token }
+      });
+      if (!pRes.ok) { logout(); return; }
+      const { user } = await pRes.json();
+
+      document.getElementById("sidebarAvatar").textContent = user.username[0].toUpperCase();
+      document.getElementById("sidebarName").textContent   = user.username;
+      document.getElementById("sidebarEmail").textContent  = user.email;
+
+      // Load leaderboard
+      const lRes = await fetch(`${API}/protected/leaderboard`, {
+        headers: { "Authorization": "Bearer " + token }
+      });
+      const { leaderboard } = await lRes.json();
+
+      renderPodium(leaderboard, user.username);
+      renderFullList(leaderboard, user.username);
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  function renderPodium(lb, currentUser) {
+    const podium = document.getElementById("podium");
+    podium.innerHTML = "";
+    if (lb.length < 3) return;
+
+    // Order: 2nd, 1st, 3rd for visual podium effect
+    const order = [lb[1], lb[0], lb[2]];
+    const medals = ["🥈", "🥇", "🥉"];
+    const ranks  = [2, 1, 3];
+
+    order.forEach((u, i) => {
+      if (!u) return;
+      const wrap = document.createElement("div");
+      wrap.className = "podium-wrap";
+      wrap.innerHTML = `
+        <div class="podium-avatar" style="width:${i===1?72:56}px;height:${i===1?72:56}px;font-size:${i===1?28:22}px">
+          ${u.username[0].toUpperCase()}
+        </div>
+        <div class="podium-name">${u.username} ${u.username === currentUser ? '<span style="color:var(--accent);font-size:10px">YOU</span>' : ""}</div>
+        <div class="podium-pts">${u.points.toLocaleString()} pts</div>
+        <div class="podium-base">${medals[i]}</div>
+      `;
+      podium.appendChild(wrap);
+    });
+  }
+
+  function renderFullList(lb, currentUser) {
+    const list = document.getElementById("lbFull");
+    list.innerHTML = "";
+
+    if (!lb.length) {
+      list.innerHTML = '<div class="empty">No players yet 👀</div>';
+      return;
+    }
+
+    lb.forEach((u, i) => {
+      const isYou = u.username === currentUser;
+      const row = document.createElement("div");
+      const topClass = i === 0 ? "top1" : i === 1 ? "top2" : i === 2 ? "top3" : "";
+      row.className = `lb-row ${topClass} ${isYou ? "you" : ""}`;
+      row.innerHTML = `
+        <div class="rank-num">${i + 1}</div>
+        <div class="lb-avatar">${u.username[0].toUpperCase()}</div>
+        <div class="lb-name">
+          <div class="lb-username">
+            ${u.username}
+            ${isYou ? '<span class="you-tag">YOU</span>' : ""}
+          </div>
+        </div>
+        <div class="lb-pts-val">${u.points.toLocaleString()}</div>
+      `;
+      list.appendChild(row);
+    });
+  }
+
+  function logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "login.html";
+  }
+</script>
+</body>
+</html>

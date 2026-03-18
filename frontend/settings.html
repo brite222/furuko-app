@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FUKURO — Settings</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #060608; --surface: #0e0e14; --card: #13131c; --card2: #181824;
+      --border: rgba(255,255,255,0.07); --accent: #c8f542; --accent2: #42f5c8;
+      --accent3: #f542a4; --text: #f0f0f8; --muted: #5a5a72; --muted2: #8888aa;
+      --font-display: 'Bebas Neue', sans-serif; --font-body: 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; overflow-x: hidden; transition: background 0.3s, color 0.3s; }
+    body.light {
+      --bg: #f0f0f8; --surface: #e0e0ee; --card: #ffffff; --card2: #f5f5ff;
+      --border: rgba(0,0,0,0.08); --text: #1a1a2e; --muted: #9999bb; --muted2: #6666aa;
+    }
+    .bg-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(200,245,66,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(200,245,66,0.03) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; z-index: 0; }
+    .bg-glow { position: fixed; top: -300px; left: 50%; transform: translateX(-50%); width: 900px; height: 600px; background: radial-gradient(ellipse, rgba(200,245,66,0.06) 0%, transparent 65%); pointer-events: none; z-index: 0; }
+    .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; position: relative; z-index: 1; }
+    .sidebar { grid-row: 1 / -1; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 32px 0; position: sticky; top: 0; height: 100vh; }
+    .logo { padding: 0 24px 32px; border-bottom: 1px solid var(--border); }
+    .logo-text { font-family: var(--font-display); font-size: 36px; letter-spacing: 4px; color: var(--accent); line-height: 1; }
+    .logo-sub { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
+    .nav { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+    .nav-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; padding: 0 8px; margin: 12px 0 6px; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; color: var(--muted2); font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; border: 1px solid transparent; }
+    .nav-item:hover { color: var(--text); background: var(--card); }
+    .nav-item.active { color: var(--accent); background: rgba(200,245,66,0.08); border-color: rgba(200,245,66,0.15); }
+    .nav-item .icon { width: 18px; text-align: center; font-size: 16px; }
+    .nav-item .badge { margin-left: auto; background: var(--accent3); color: #000; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; font-family: var(--font-mono); }
+    .sidebar-bottom { padding: 16px; border-top: 1px solid var(--border); }
+    .user-chip { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--card); border-radius: 10px; border: 1px solid var(--border); }
+    .avatar-sm { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #000; flex-shrink: 0; }
+    .user-info { flex: 1; min-width: 0; }
+    .user-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-email { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .logout-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; transition: color 0.2s; }
+    .logout-btn:hover { color: #fa6d6d; }
+
+    .content { padding: 32px; overflow-y: auto; }
+    .page-title { font-family: var(--font-display); font-size: 40px; letter-spacing: 3px; margin-bottom: 32px; }
+    .settings-grid { display: flex; flex-direction: column; gap: 20px; max-width: 680px; }
+
+    .setting-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .setting-card-title { font-family: var(--font-display); font-size: 20px; letter-spacing: 1px; padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+    .setting-row { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid var(--border); }
+    .setting-row:last-child { border-bottom: none; }
+    .setting-info { flex: 1; }
+    .setting-label { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+    .setting-desc { font-size: 12px; color: var(--muted2); }
+
+    /* Toggle switch */
+    .toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; inset: 0; background: var(--card2); border: 1px solid var(--border); border-radius: 24px; cursor: pointer; transition: 0.3s; }
+    .toggle-slider::before { content: ''; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: var(--muted); border-radius: 50%; transition: 0.3s; }
+    .toggle input:checked + .toggle-slider { background: rgba(200,245,66,0.2); border-color: var(--accent); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(20px); background: var(--accent); }
+
+    /* Select */
+    .setting-select { background: var(--card2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; color: var(--text); font-family: var(--font-body); font-size: 13px; outline: none; cursor: pointer; transition: border-color 0.2s; }
+    .setting-select:focus { border-color: var(--accent); }
+
+    /* Theme buttons */
+    .theme-options { display: flex; gap: 8px; }
+    .theme-btn { padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--card2); color: var(--muted2); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; font-family: var(--font-body); }
+    .theme-btn.active { background: rgba(200,245,66,0.1); border-color: var(--accent); color: var(--accent); }
+
+    .btn { padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-family: var(--font-body); font-weight: 600; font-size: 14px; transition: all 0.2s; }
+    .btn-accent { background: var(--accent); color: #000; }
+    .btn-accent:hover { background: #d4ff44; }
+    .btn-danger { background: rgba(245,66,66,0.12); color: #fa6d6d; border: 1px solid rgba(245,66,66,0.25); width: 100%; }
+    .btn-danger:hover { background: rgba(245,66,66,0.22); }
+
+    .danger-zone { padding: 24px; }
+    .danger-title { font-size: 13px; color: var(--muted2); margin-bottom: 12px; }
+
+    .save-bar { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--card2); border: 1px solid var(--border); border-radius: 16px; padding: 12px 24px; display: flex; align-items: center; gap: 16px; z-index: 50; box-shadow: 0 8px 32px rgba(0,0,0,0.4); opacity: 0; pointer-events: none; transition: all 0.3s; }
+    .save-bar.show { opacity: 1; pointer-events: all; }
+    .save-bar-text { font-size: 13px; color: var(--muted2); }
+
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 14px; z-index: 200; transform: translateY(80px); opacity: 0; transition: all 0.3s ease; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-color: rgba(200,245,66,0.3); }
+    .toast.error { border-color: rgba(250,109,109,0.3); }
+
+    .loading-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; transition: opacity 0.5s, visibility 0.5s; }
+    .loading-overlay.hidden { opacity: 0; visibility: hidden; }
+    .loading-logo { font-family: var(--font-display); font-size: 64px; letter-spacing: 8px; color: var(--accent); animation: flicker 1.5s ease infinite; }
+    @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .loading-bar-wrap { width: 200px; height: 2px; background: var(--border); border-radius: 2px; margin-top: 24px; overflow: hidden; }
+    .loading-bar { height: 100%; background: var(--accent); border-radius: 2px; animation: loadBar 1.5s ease forwards; }
+    @keyframes loadBar { from { width: 0; } to { width: 100%; } }
+
+    @media (max-width: 768px) { .app { grid-template-columns: 1fr; } .sidebar { display: none; } .content { padding: 16px; } }
+  </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loader">
+  <div class="loading-logo">FUKURO</div>
+  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+</div>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+<div class="toast" id="toast"></div>
+
+<div class="save-bar" id="saveBar">
+  <span class="save-bar-text">You have unsaved changes</span>
+  <button class="btn btn-accent" onclick="saveSettings()">Save Settings</button>
+</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-text">FUKURO</div>
+      <div class="logo-sub">Ecosystem Dashboard</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-label">Main</div>
+      <a class="nav-item" href="dashboard.html"><span class="icon">⚡</span> Dashboard</a>
+      <a class="nav-item" href="leaderboard.html"><span class="icon">🏆</span> Leaderboard <span class="badge">LIVE</span></a>
+      <a class="nav-item" href="dashboard.html#wallet"><span class="icon">💼</span> Wallet</a>
+      <div class="nav-label">Activity</div>
+      <a class="nav-item" href="#"><span class="icon">✅</span> Tasks</a>
+      <a class="nav-item" href="#"><span class="icon">📈</span> Points History</a>
+      <div class="nav-label">Account</div>
+      <a class="nav-item" href="profile.html"><span class="icon">👤</span> Profile</a>
+      <a class="nav-item active" href="settings.html"><span class="icon">⚙️</span> Settings</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-chip">
+        <div class="avatar-sm" id="sidebarAvatar">?</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebarName">Loading...</div>
+          <div class="user-email" id="sidebarEmail">—</div>
+        </div>
+        <button class="logout-btn" onclick="logout()" title="Logout">⏻</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="content">
+    <div class="page-title">SETTINGS</div>
+    <div class="settings-grid">
+
+      <!-- APPEARANCE -->
+      <div class="setting-card">
+        <div class="setting-card-title">🎨 Appearance</div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Theme</div>
+            <div class="setting-desc">Choose your preferred color scheme</div>
+          </div>
+          <div class="theme-options">
+            <button class="theme-btn active" id="themeDark" onclick="setTheme('dark')">🌙 Dark</button>
+            <button class="theme-btn" id="themeLight" onclick="setTheme('light')">☀️ Light</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Language</div>
+            <div class="setting-desc">Select your preferred language</div>
+          </div>
+          <select class="setting-select" id="language" onchange="markDirty()">
+            <option value="en">🇺🇸 English</option>
+            <option value="es">🇪🇸 Spanish</option>
+            <option value="fr">🇫🇷 French</option>
+            <option value="de">🇩🇪 German</option>
+            <option value="pt">🇧🇷 Portuguese</option>
+            <option value="ar">🇸🇦 Arabic</option>
+            <option value="zh">🇨🇳 Chinese</option>
+            <option value="ja">🇯🇵 Japanese</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <div class="setting-card">
+        <div class="setting-card-title">🔔 Notifications</div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Email Notifications</div>
+            <div class="setting-desc">Receive updates and alerts via email</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="notifEmail" onchange="markDirty()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Streak Reminders</div>
+            <div class="setting-desc">Get reminded to maintain your daily streak</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="notifStreak" onchange="markDirty()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Rank Change Alerts</div>
+            <div class="setting-desc">Know when your leaderboard rank changes</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="notifRank" onchange="markDirty()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- PRIVACY -->
+      <div class="setting-card">
+        <div class="setting-card-title">🔒 Privacy</div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Hide from Leaderboard</div>
+            <div class="setting-desc">Your profile won't appear in public rankings</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="hideLeaderboard" onchange="markDirty()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- DANGER ZONE -->
+      <div class="setting-card">
+        <div class="setting-card-title">⚠️ Danger Zone</div>
+        <div class="danger-zone">
+          <div class="danger-title">Permanently delete your account and all associated data. This action cannot be undone.</div>
+          <button class="btn btn-danger" onclick="deleteAccount()">🗑️ Delete My Account</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = "http://127.0.0.1:5000/api";
+  const token = localStorage.getItem("token");
+  let isDirty = false;
+  let currentSettings = {};
+
+  window.onload = async () => {
+    setTimeout(() => document.getElementById("loader").classList.add("hidden"), 1500);
+    if (!token) { window.location.href = "login.html"; return; }
+
+    // Apply saved theme immediately
+    const savedTheme = localStorage.getItem("theme") || "dark";
+    applyTheme(savedTheme);
+
+    try {
+      const res = await fetch(`${API}/protected/profile`, {
+        headers: { "Authorization": "Bearer " + token }
+      });
+      if (!res.ok) { logout(); return; }
+      const { user } = await res.json();
+
+      document.getElementById("sidebarAvatar").textContent = user.username[0].toUpperCase();
+      document.getElementById("sidebarName").textContent   = user.username;
+      document.getElementById("sidebarEmail").textContent  = user.email;
+
+      // Load settings
+      const sRes = await fetch(`${API}/protected/settings`, {
+        headers: { "Authorization": "Bearer " + token }
+      });
+      const { settings } = await sRes.json();
+      currentSettings = settings;
+      applySettings(settings);
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  function applySettings(s) {
+    if (!s) return;
+    setTheme(s.theme || "dark", false);
+    document.getElementById("language").value         = s.language || "en";
+    document.getElementById("notifEmail").checked     = s.notifications?.email ?? true;
+    document.getElementById("notifStreak").checked    = s.notifications?.streak ?? true;
+    document.getElementById("notifRank").checked      = s.notifications?.rank ?? true;
+    document.getElementById("hideLeaderboard").checked = s.hideLeaderboard ?? false;
+  }
+
+  function setTheme(theme, dirty = true) {
+    applyTheme(theme);
+    document.getElementById("themeDark").classList.toggle("active", theme === "dark");
+    document.getElementById("themeLight").classList.toggle("active", theme === "light");
+    if (dirty) markDirty();
+  }
+
+  function applyTheme(theme) {
+    document.body.classList.toggle("light", theme === "light");
+    localStorage.setItem("theme", theme);
+  }
+
+  function markDirty() {
+    isDirty = true;
+    document.getElementById("saveBar").classList.add("show");
+  }
+
+  async function saveSettings() {
+    const settings = {
+      theme:           localStorage.getItem("theme") || "dark",
+      language:        document.getElementById("language").value,
+      hideLeaderboard: document.getElementById("hideLeaderboard").checked,
+      notifications: {
+        email:  document.getElementById("notifEmail").checked,
+        streak: document.getElementById("notifStreak").checked,
+        rank:   document.getElementById("notifRank").checked,
+      }
+    };
+
+    try {
+      const res = await fetch(`${API}/protected/settings`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify(settings)
+      });
+      const data = await res.json();
+      if (res.ok) {
+        isDirty = false;
+        document.getElementById("saveBar").classList.remove("show");
+        showToast("✅ Settings saved!", "success");
+      } else {
+        showToast(data.message, "error");
+      }
+    } catch (err) {
+      showToast("Network error ❌", "error");
+    }
+  }
+
+  async function deleteAccount() {
+    const confirmed = confirm("⚠️ Are you sure? This will permanently delete your account and all data. This cannot be undone.");
+    if (!confirmed) return;
+
+    const doubleConfirm = confirm("Last chance — delete your account forever?");
+    if (!doubleConfirm) return;
+
+    try {
+      const res = await fetch(`${API}/protected/account`, {
+        method: "DELETE",
+        headers: { "Authorization": "Bearer " + token }
+      });
+      if (res.ok) {
+        localStorage.clear();
+        window.location.href = "index.html";
+      }
+    } catch (err) {
+      showToast("Network error ❌", "error");
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "login.html";
+  }
+
+  function showToast(msg, type = "") {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => t.classList.remove("show"), 2500);
+  }
+</script>
+</body>
+</html>

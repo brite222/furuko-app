@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FUKURO — Earn. Compete. Dominate.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #060608;
+      --surface: #0e0e14;
+      --card: #13131c;
+      --card2: #181824;
+      --border: rgba(255,255,255,0.07);
+      --accent: #c8f542;
+      --accent2: #42f5c8;
+      --accent3: #f542a4;
+      --text: #f0f0f8;
+      --muted: #5a5a72;
+      --muted2: #8888aa;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-body: 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 64px;
+      height: 72px;
+      background: rgba(6,6,8,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 28px;
+      letter-spacing: 4px;
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted2);
+      text-decoration: none;
+      transition: color 0.2s;
+      font-family: var(--font-mono);
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-btns {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-ghost {
+      padding: 9px 20px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: none;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    .btn-primary {
+      padding: 9px 20px;
+      border: none;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #000;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover { background: #d4ff44; transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 32px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(200,245,66,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,245,66,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+
+    .hero-glow {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 500px;
+      background: radial-gradient(ellipse, rgba(200,245,66,0.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-glow2 {
+      position: absolute;
+      bottom: 0;
+      right: -200px;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(ellipse, rgba(245,66,164,0.05) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(200,245,66,0.08);
+      border: 1px solid rgba(200,245,66,0.2);
+      border-radius: 100px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+      position: relative;
+      z-index: 1;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-tag-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 6px var(--accent);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(72px, 10vw, 140px);
+      line-height: 0.95;
+      letter-spacing: 4px;
+      position: relative;
+      z-index: 1;
+      animation: fadeUp 0.6s ease 0.1s both;
+    }
+
+    .hero-title .line2 { color: var(--accent); }
+    .hero-title .line3 { -webkit-text-stroke: 1px rgba(255,255,255,0.3); color: transparent; }
+
+    .hero-sub {
+      font-size: 17px;
+      color: var(--muted2);
+      line-height: 1.7;
+      max-width: 520px;
+      margin: 28px auto 48px;
+      position: relative;
+      z-index: 1;
+      animation: fadeUp 0.6s ease 0.2s both;
+    }
+
+    .hero-btns {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+      z-index: 1;
+      animation: fadeUp 0.6s ease 0.3s both;
+    }
+
+    .btn-hero {
+      padding: 16px 36px;
+      border-radius: 10px;
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-hero-primary {
+      background: var(--accent);
+      color: #000;
+      border: none;
+    }
+
+    .btn-hero-primary:hover {
+      background: #d4ff44;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(200,245,66,0.25);
+    }
+
+    .btn-hero-ghost {
+      background: none;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-hero-ghost:hover { border-color: var(--muted2); }
+
+    .hero-stats {
+      display: flex;
+      align-items: center;
+      gap: 48px;
+      margin-top: 72px;
+      position: relative;
+      z-index: 1;
+      animation: fadeUp 0.6s ease 0.4s both;
+    }
+
+    .hero-stat {
+      text-align: center;
+    }
+
+    .hero-stat-num {
+      font-family: var(--font-display);
+      font-size: 40px;
+      letter-spacing: 2px;
+      color: var(--accent);
+    }
+
+    .hero-stat-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-top: 4px;
+    }
+
+    .hero-stat-divider {
+      width: 1px;
+      height: 40px;
+      background: var(--border);
+    }
+
+    @keyframes fadeUp {
+      from { transform: translateY(24px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* ── MARQUEE ── */
+    .marquee-wrap {
+      overflow: hidden;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0;
+      background: var(--surface);
+    }
+
+    .marquee-track {
+      display: flex;
+      gap: 48px;
+      animation: marquee 20s linear infinite;
+      width: max-content;
+    }
+
+    .marquee-item {
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: 3px;
+      color: var(--muted);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 48px;
+    }
+
+    .marquee-item span { color: var(--accent); font-size: 14px; }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* ── SECTION ── */
+    section {
+      padding: 120px 64px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-tag::before {
+      content: '';
+      width: 24px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(40px, 5vw, 64px);
+      letter-spacing: 2px;
+      line-height: 1.05;
+      margin-bottom: 16px;
+    }
+
+    .section-title span { color: var(--accent); }
+
+    .section-sub {
+      font-size: 16px;
+      color: var(--muted2);
+      line-height: 1.7;
+      max-width: 500px;
+      margin-bottom: 64px;
+    }
+
+    /* ── FEATURES ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      transition: border-color 0.2s, transform 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .feature-card:hover { border-color: rgba(200,245,66,0.2); transform: translateY(-4px); }
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(200,245,66,0.08);
+      border: 1px solid rgba(200,245,66,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+
+    .feature-title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    .feature-desc {
+      font-size: 14px;
+      color: var(--muted2);
+      line-height: 1.7;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      position: relative;
+    }
+
+    .how-grid::before {
+      content: '';
+      position: absolute;
+      top: 32px;
+      left: 10%;
+      right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), var(--border), transparent);
+    }
+
+    .how-step {
+      text-align: center;
+      padding: 0 24px;
+      position: relative;
+    }
+
+    .how-num {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 28px;
+      color: var(--accent);
+      margin: 0 auto 24px;
+      position: relative;
+      z-index: 1;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .how-step:hover .how-num {
+      border-color: var(--accent);
+      box-shadow: 0 0 20px rgba(200,245,66,0.15);
+    }
+
+    .how-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    .how-desc {
+      font-size: 13px;
+      color: var(--muted2);
+      line-height: 1.7;
+    }
+
+    /* ── LEADERBOARD PREVIEW ── */
+    .lb-preview {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
+    }
+
+    .lb-header {
+      padding: 24px 32px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .lb-header-title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: 1px;
+    }
+
+    .lb-live {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent);
+    }
+
+    .lb-rows { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+
+    .lb-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      transition: border-color 0.2s;
+    }
+
+    .lb-row:hover { border-color: rgba(200,245,66,0.15); }
+    .lb-row.top { border-color: rgba(200,245,66,0.2); background: rgba(200,245,66,0.04); }
+
+    .lb-pos {
+      font-family: var(--font-display);
+      font-size: 22px;
+      width: 32px;
+      text-align: center;
+    }
+
+    .lb-row:nth-child(1) .lb-pos { color: #ffd700; }
+    .lb-row:nth-child(2) .lb-pos { color: #c0c0c0; }
+    .lb-row:nth-child(3) .lb-pos { color: #cd7f32; }
+
+    .lb-ava {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      color: #000;
+      flex-shrink: 0;
+    }
+
+    .lb-uname { flex: 1; font-size: 14px; font-weight: 600; }
+    .lb-upts { font-family: var(--font-mono); font-size: 14px; font-weight: 500; }
+
+    .lb-bar-wrap {
+      width: 80px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .lb-bar { height: 100%; background: var(--accent); border-radius: 2px; }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 120px 64px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 800px;
+      height: 400px;
+      background: radial-gradient(ellipse, rgba(200,245,66,0.06) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .cta-title {
+      font-family: var(--font-display);
+      font-size: clamp(48px, 7vw, 96px);
+      letter-spacing: 3px;
+      line-height: 1;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-title span { color: var(--accent); }
+
+    .cta-sub {
+      font-size: 16px;
+      color: var(--muted2);
+      max-width: 480px;
+      margin: 0 auto 48px;
+      line-height: 1.7;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-btns {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 48px 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 24px;
+      letter-spacing: 4px;
+      color: var(--accent);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 32px;
+    }
+
+    .footer-links a {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+
+    .footer-copy {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 900px) {
+      nav { padding: 0 24px; }
+      .nav-links { display: none; }
+      section { padding: 80px 24px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .how-grid { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+      .how-grid::before { display: none; }
+      .hero-stats { gap: 24px; flex-wrap: wrap; justify-content: center; }
+      .cta-section { padding: 80px 24px; }
+      footer { flex-direction: column; gap: 24px; text-align: center; }
+      .footer-links { flex-wrap: wrap; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-logo">FUKURO</div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#how">How it works</a>
+    <a href="#leaderboard">Leaderboard</a>
+  </div>
+  <div class="nav-btns">
+    <a href="login.html" class="btn-ghost">Login</a>
+    <a href="register.html" class="btn-primary">Get Started</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+
+  <div class="hero-tag">
+    <div class="hero-tag-dot"></div>
+    Now Live — Join the Ecosystem
+  </div>
+
+  <div class="hero-title">
+    EARN.<br>
+    <span class="line2">COMPETE.</span><br>
+    <span class="line3">DOMINATE.</span>
+  </div>
+
+  <p class="hero-sub">
+    FUKURO is the ecosystem where engagement gets rewarded.
+    Complete tasks, climb the leaderboard, and connect your wallet
+    to unlock real rewards.
+  </p>
+
+  <div class="hero-btns">
+    <a href="register.html" class="btn-hero btn-hero-primary">
+      Start Earning ⚡
+    </a>
+    <a href="#how" class="btn-hero btn-hero-ghost">
+      How it works →
+    </a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-num">10K+</div>
+      <div class="hero-stat-label">Active Users</div>
+    </div>
+    <div class="hero-stat-divider"></div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">500K+</div>
+      <div class="hero-stat-label">Points Distributed</div>
+    </div>
+    <div class="hero-stat-divider"></div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">50+</div>
+      <div class="hero-stat-label">Daily Tasks</div>
+    </div>
+    <div class="hero-stat-divider"></div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">99%</div>
+      <div class="hero-stat-label">Uptime</div>
+    </div>
+  </div>
+</div>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <div class="marquee-item">EARN POINTS <span>✦</span> CLIMB RANKS <span>✦</span> CONNECT WALLET <span>✦</span> REFER FRIENDS <span>✦</span> DAILY TASKS <span>✦</span> LEADERBOARD <span>✦</span></div>
+    <div class="marquee-item">EARN POINTS <span>✦</span> CLIMB RANKS <span>✦</span> CONNECT WALLET <span>✦</span> REFER FRIENDS <span>✦</span> DAILY TASKS <span>✦</span> LEADERBOARD <span>✦</span></div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-tag">Core Features</div>
+  <div class="section-title">EVERYTHING YOU<br><span>NEED TO WIN</span></div>
+  <p class="section-sub">FUKURO gives you all the tools to earn, compete, and build your reputation in the ecosystem.</p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <div class="feature-title">POINTS SYSTEM</div>
+      <p class="feature-desc">Earn points by completing daily tasks, logging in, referring friends, and participating in the ecosystem. Every action counts.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🏆</div>
+      <div class="feature-title">LEADERBOARD</div>
+      <p class="feature-desc">Compete globally. Your rank updates in real time based on your points. Top performers get recognized across the platform.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💼</div>
+      <div class="feature-title">WALLET INTEGRATION</div>
+      <p class="feature-desc">Connect your wallet address to the platform for identification and rewards. Earn bonus points just for connecting.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔗</div>
+      <div class="feature-title">REFERRAL SYSTEM</div>
+      <p class="feature-desc">Share your unique referral code and earn 100 points for every person who joins. Your referred users get a bonus too.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔥</div>
+      <div class="feature-title">STREAK REWARDS</div>
+      <p class="feature-desc">Log in daily to build your streak. Consistent engagement keeps your points growing and your rank climbing.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔐</div>
+      <div class="feature-title">SECURE AUTH</div>
+      <p class="feature-desc">Your account is protected with bcrypt password hashing and JWT token authentication. Your data stays safe.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" style="background: var(--surface); max-width: 100%; padding: 120px 64px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div style="max-width: 1200px; margin: 0 auto;">
+    <div class="section-tag">How it works</div>
+    <div class="section-title">FOUR STEPS TO<br><span>GET STARTED</span></div>
+    <p class="section-sub" style="margin-bottom: 80px;">Getting started on FUKURO takes less than a minute.</p>
+
+    <div class="how-grid">
+      <div class="how-step">
+        <div class="how-num">1</div>
+        <div class="how-title">CREATE ACCOUNT</div>
+        <p class="how-desc">Register with your username, email, and password. Takes under 30 seconds.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-num">2</div>
+        <div class="how-title">COMPLETE TASKS</div>
+        <p class="how-desc">Log in daily, connect your wallet, refer friends, and complete your profile to earn points.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-num">3</div>
+        <div class="how-title">CLIMB RANKS</div>
+        <p class="how-desc">Your global rank updates as you earn more points. Compete to reach the top of the leaderboard.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-num">4</div>
+        <div class="how-title">EARN REWARDS</div>
+        <p class="how-desc">Top performers and active users earn recognition and rewards within the ecosystem.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LEADERBOARD PREVIEW -->
+<section id="leaderboard">
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;">
+    <div>
+      <div class="section-tag">Live Rankings</div>
+      <div class="section-title">SEE WHERE<br>YOU <span>RANK</span></div>
+      <p class="section-sub" style="margin-bottom: 32px;">The leaderboard updates in real time. Every point you earn moves you up the global rankings.</p>
+      <a href="index.html" class="btn-hero btn-hero-primary" style="display: inline-flex;">Join & Compete →</a>
+    </div>
+
+    <div class="lb-preview">
+      <div class="lb-header">
+        <div class="lb-header-title">GLOBAL LEADERBOARD</div>
+        <div class="lb-live">
+          <div class="hero-tag-dot"></div>
+          LIVE
+        </div>
+      </div>
+      <div class="lb-rows">
+        <div class="lb-row top">
+          <div class="lb-pos">1</div>
+          <div class="lb-ava">C</div>
+          <div class="lb-uname">cryptowolf</div>
+          <div class="lb-bar-wrap"><div class="lb-bar" style="width:100%"></div></div>
+          <div class="lb-upts" style="color:var(--accent)">9,870</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-pos">2</div>
+          <div class="lb-ava" style="background:linear-gradient(135deg,#42f5c8,#42a5f5)">S</div>
+          <div class="lb-uname">starlord</div>
+          <div class="lb-bar-wrap"><div class="lb-bar" style="width:83%"></div></div>
+          <div class="lb-upts">8,210</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-pos">3</div>
+          <div class="lb-ava" style="background:linear-gradient(135deg,#f542a4,#f5a442)">N</div>
+          <div class="lb-uname">nexusX</div>
+          <div class="lb-bar-wrap"><div class="lb-bar" style="width:77%"></div></div>
+          <div class="lb-upts">7,650</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-pos">4</div>
+          <div class="lb-ava" style="background:linear-gradient(135deg,#a542f5,#42f5c8)">B</div>
+          <div class="lb-uname">brightommy</div>
+          <div class="lb-bar-wrap"><div class="lb-bar" style="width:35%"></div></div>
+          <div class="lb-upts">3,420</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-pos">5</div>
+          <div class="lb-ava" style="background:linear-gradient(135deg,#f5f542,#f542a4)">P</div>
+          <div class="lb-uname">phantom99</div>
+          <div class="lb-bar-wrap"><div class="lb-bar" style="width:31%"></div></div>
+          <div class="lb-upts">3,100</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-section">
+  <div class="cta-title">READY TO<br><span>DOMINATE?</span></div>
+  <p class="cta-sub">Join thousands of users already earning points and climbing the leaderboard. It's free and takes 30 seconds.</p>
+  <div class="cta-btns">
+  <a href="register.html" class="btn-hero btn-hero-primary">Create Free Account ⚡</a>
+    <a href="login.html" class="btn-hero btn-hero-ghost">I have an account →</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">FUKURO</div>
+  <div class="footer-links">
+    <a href="#features">Features</a>
+    <a href="#how">How it works</a>
+    <a href="#leaderboard">Leaderboard</a>
+    <a href="login.html">Login</a>
+    <a href="index.html">Register</a>
+  </div>
+  <div class="footer-copy">© 2025 FUKURO. All rights reserved.</div>
+</footer>
+
+</body>
+</html>

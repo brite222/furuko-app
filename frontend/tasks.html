@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FUKURO — Tasks</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #060608; --surface: #0e0e14; --card: #13131c; --card2: #181824;
+      --border: rgba(255,255,255,0.07); --accent: #c8f542; --accent2: #42f5c8;
+      --accent3: #f542a4; --text: #f0f0f8; --muted: #5a5a72; --muted2: #8888aa;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-body: 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; overflow-x: hidden; }
+    .bg-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(200,245,66,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(200,245,66,0.03) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; z-index: 0; }
+    .bg-glow { position: fixed; top: -300px; left: 50%; transform: translateX(-50%); width: 900px; height: 600px; background: radial-gradient(ellipse, rgba(200,245,66,0.05) 0%, transparent 65%); pointer-events: none; z-index: 0; }
+    .app { display: grid; grid-template-columns: 240px 1fr; grid-template-rows: auto 1fr; min-height: 100vh; position: relative; z-index: 1; }
+    .sidebar { grid-row: 1 / -1; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 32px 0; position: sticky; top: 0; height: 100vh; animation: slideInLeft 0.5s ease both; }
+    @keyframes slideInLeft { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .logo { padding: 0 24px 32px; border-bottom: 1px solid var(--border); }
+    .logo-text { font-family: var(--font-display); font-size: 36px; letter-spacing: 4px; color: var(--accent); line-height: 1; }
+    .logo-sub { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
+    .nav { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+    .nav-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; padding: 0 8px; margin: 12px 0 6px; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; color: var(--muted2); font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; border: 1px solid transparent; }
+    .nav-item:hover { color: var(--text); background: var(--card); }
+    .nav-item.active { color: var(--accent); background: rgba(200,245,66,0.08); border-color: rgba(200,245,66,0.15); }
+    .nav-item .icon { width: 18px; text-align: center; font-size: 16px; }
+    .nav-item .badge { margin-left: auto; background: var(--accent3); color: #000; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; font-family: var(--font-mono); }
+    .sidebar-bottom { padding: 16px; border-top: 1px solid var(--border); }
+    .user-chip { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--card); border-radius: 10px; border: 1px solid var(--border); }
+    .avatar { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #000; flex-shrink: 0; }
+    .user-info { flex: 1; min-width: 0; }
+    .user-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-email { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .logout-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; transition: color 0.2s; }
+    .logout-btn:hover { color: #fa6d6d; }
+    .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; height: 64px; display: flex; align-items: center; justify-content: space-between; animation: fadeDown 0.5s ease both; }
+    @keyframes fadeDown { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .page-title { font-family: var(--font-display); font-size: 28px; letter-spacing: 2px; }
+    .status-dot { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted2); font-family: var(--font-mono); }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+    .main { padding: 32px; display: flex; flex-direction: column; gap: 24px; overflow-y: auto; }
+    @keyframes fadeUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; animation: fadeUp 0.5s ease both; }
+    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .card-title { font-family: var(--font-display); font-size: 20px; letter-spacing: 1px; }
+    .card-badge { font-family: var(--font-mono); font-size: 11px; color: var(--muted); background: var(--card2); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); }
+
+    /* PROGRESS BAR */
+    .progress-wrap { margin-bottom: 8px; }
+    .progress-bar-bg { width: 100%; height: 6px; background: var(--card2); border-radius: 3px; overflow: hidden; }
+    .progress-bar { height: 100%; background: var(--accent); border-radius: 3px; transition: width 1s ease; }
+    .progress-labels { display: flex; justify-content: space-between; margin-top: 8px; }
+    .progress-label { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+    .progress-pct { font-family: var(--font-mono); font-size: 11px; color: var(--accent); }
+
+    /* SUMMARY CARDS */
+    .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .summary-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; animation: fadeUp 0.5s ease both; transition: border-color 0.2s, transform 0.2s; position: relative; overflow: hidden; }
+    .summary-card:hover { border-color: rgba(200,245,66,0.2); transform: translateY(-2px); }
+    .summary-card:nth-child(1) { animation-delay: 0.1s; }
+    .summary-card:nth-child(2) { animation-delay: 0.2s; }
+    .summary-card:nth-child(3) { animation-delay: 0.3s; }
+    .summary-card::before { content: ''; position: absolute; top: 0; right: 0; width: 50px; height: 50px; border-radius: 0 16px 0 50px; opacity: 0.1; }
+    .summary-card.green::before { background: var(--accent); }
+    .summary-card.cyan::before { background: var(--accent2); }
+    .summary-card.pink::before { background: var(--accent3); }
+    .summary-icon { font-size: 20px; margin-bottom: 10px; }
+    .summary-value { font-family: var(--font-display); font-size: 36px; letter-spacing: 1px; line-height: 1; margin-bottom: 4px; }
+    .summary-card.green .summary-value { color: var(--accent); }
+    .summary-card.cyan .summary-value { color: var(--accent2); }
+    .summary-card.pink .summary-value { color: var(--accent3); }
+    .summary-label { font-size: 12px; color: var(--muted2); font-weight: 500; }
+
+    /* TASK CARDS */
+    .tasks-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+
+    .task-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px; transition: border-color 0.2s, transform 0.2s; animation: fadeUp 0.5s ease both; position: relative; overflow: hidden; }
+    .task-card:hover { border-color: rgba(200,245,66,0.15); transform: translateY(-2px); }
+    .task-card.completed { opacity: 0.7; }
+    .task-card.completed::after { content: ''; position: absolute; inset: 0; background: rgba(200,245,66,0.02); pointer-events: none; }
+
+    .task-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .task-card-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .task-card-icon.done { background: rgba(200,245,66,0.1); border: 1px solid rgba(200,245,66,0.2); }
+    .task-card-icon.pending { background: var(--card2); border: 1px solid var(--border); }
+
+    .task-card-info { flex: 1; }
+    .task-card-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+    .task-card-desc { font-size: 12px; color: var(--muted2); line-height: 1.5; }
+
+    .task-pts-badge { font-family: var(--font-display); font-size: 22px; color: var(--accent); letter-spacing: 1px; white-space: nowrap; }
+
+    .task-card-bottom { display: flex; align-items: center; justify-content: space-between; }
+
+    .task-status { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; }
+    .task-status.done { color: var(--accent); }
+    .task-status.pending { color: var(--muted2); }
+    .task-status-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .task-status.done .task-status-dot { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+    .task-status.pending .task-status-dot { background: var(--muted); }
+
+    .btn-complete { padding: 8px 16px; background: var(--accent); color: #000; border: none; border-radius: 8px; font-family: var(--font-body); font-weight: 700; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+    .btn-complete:hover { background: #d4ff44; transform: translateY(-1px); }
+    .btn-complete:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .btn-done { padding: 8px 16px; background: rgba(200,245,66,0.08); color: var(--accent); border: 1px solid rgba(200,245,66,0.2); border-radius: 8px; font-family: var(--font-body); font-weight: 600; font-size: 12px; cursor: default; }
+
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 14px; z-index: 200; transform: translateY(80px); opacity: 0; transition: all 0.3s ease; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-color: rgba(200,245,66,0.3); }
+    .toast.error { border-color: rgba(250,109,109,0.3); }
+
+    .loading-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; transition: opacity 0.5s, visibility 0.5s; }
+    .loading-overlay.hidden { opacity: 0; visibility: hidden; }
+    .loading-logo { font-family: var(--font-display); font-size: 64px; letter-spacing: 8px; color: var(--accent); animation: flicker 1.5s ease infinite; }
+    @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .loading-bar-wrap { width: 200px; height: 2px; background: var(--border); border-radius: 2px; margin-top: 24px; overflow: hidden; }
+    .loading-bar { height: 100%; background: var(--accent); border-radius: 2px; animation: loadBar 1.5s ease forwards; }
+    @keyframes loadBar { from { width: 0; } to { width: 100%; } }
+
+    @media (max-width: 768px) { .app { grid-template-columns: 1fr; } .sidebar { display: none; } .main { padding: 16px; } .summary-grid { grid-template-columns: 1fr; } .tasks-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loader">
+  <div class="loading-logo">FUKURO</div>
+  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+</div>
+
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+<div class="toast" id="toast"></div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-text">FUKURO</div>
+      <div class="logo-sub">Ecosystem Dashboard</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-label">Main</div>
+      <a class="nav-item" href="dashboard.html"><span class="icon">⚡</span> Dashboard</a>
+      <a class="nav-item" href="leaderboard.html"><span class="icon">🏆</span> Leaderboard <span class="badge">LIVE</span></a>
+      <a class="nav-item" href="dashboard.html#wallet"><span class="icon">💼</span> Wallet</a>
+      <div class="nav-label">Activity</div>
+      <a class="nav-item active" href="tasks.html"><span class="icon">✅</span> Tasks</a>
+      <a class="nav-item" href="points-history.html"><span class="icon">📈</span> Points History</a>
+      <div class="nav-label">Account</div>
+      <a class="nav-item" href="profile.html"><span class="icon">👤</span> Profile</a>
+      <a class="nav-item" href="settings.html"><span class="icon">⚙️</span> Settings</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-chip">
+        <div class="avatar" id="sidebarAvatar">?</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebarName">Loading...</div>
+          <div class="user-email" id="sidebarEmail">—</div>
+        </div>
+        <button class="logout-btn" onclick="logout()" title="Logout">⏻</button>
+      </div>
+    </div>
+  </aside>
+
+  <header class="topbar">
+    <div class="page-title">DAILY TASKS</div>
+    <div class="status-dot"><div class="dot"></div><span>LIVE</span></div>
+  </header>
+
+  <main class="main">
+
+    <!-- SUMMARY -->
+    <div class="summary-grid">
+      <div class="summary-card green">
+        <div class="summary-icon">✅</div>
+        <div class="summary-value" id="doneCount">0</div>
+        <div class="summary-label">Tasks Completed</div>
+      </div>
+      <div class="summary-card cyan">
+        <div class="summary-icon">⚡</div>
+        <div class="summary-value" id="ptsEarned">0</div>
+        <div class="summary-label">Points Earned Today</div>
+      </div>
+      <div class="summary-card pink">
+        <div class="summary-icon">🎯</div>
+        <div class="summary-value" id="ptsRemaining">0</div>
+        <div class="summary-label">Points Remaining</div>
+      </div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="card" style="animation-delay:0.4s">
+      <div class="card-header">
+        <div class="card-title">TODAY'S PROGRESS</div>
+        <div class="card-badge" id="progressLabel">0 / 5 tasks</div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-bar-bg">
+          <div class="progress-bar" id="progressBar" style="width:0%"></div>
+        </div>
+        <div class="progress-labels">
+          <div class="progress-label">Daily Tasks</div>
+          <div class="progress-pct" id="progressPct">0%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TASKS GRID -->
+    <div class="tasks-grid" id="tasksGrid"></div>
+
+  </main>
+</div>
+
+<script>
+  const API = "http://127.0.0.1:5000/api";
+  const token = localStorage.getItem("token");
+
+  const TASKS_CONFIG = [
+    {
+      key: "loginToday",
+      icon: "🔐",
+      title: "Login Today",
+      desc: "Log into your FUKURO account today to keep your streak alive and earn daily points.",
+      pts: 10,
+      autoComplete: true
+    },
+    {
+      key: "connectWallet",
+      icon: "💼",
+      title: "Connect Wallet",
+      desc: "Link your wallet address to your account for identification and future rewards.",
+      pts: 50
+    },
+    {
+      key: "completeProfile",
+      icon: "👤",
+      title: "Complete Profile",
+      desc: "Fill in your profile information to unlock the complete profile bonus points.",
+      pts: 30
+    },
+    {
+      key: "referFriend",
+      icon: "🔗",
+      title: "Refer a Friend",
+      desc: "Share your referral code with a friend. Earn 100 points when they join FUKURO.",
+      pts: 100
+    },
+    {
+      key: "earn500Points",
+      icon: "🏆",
+      title: "Earn 500 Points",
+      desc: "Accumulate a total of 500 points across all your activities on the platform.",
+      pts: 20
+    }
+  ];
+
+  let currentUser = null;
+
+  window.onload = async () => {
+    setTimeout(() => document.getElementById("loader").classList.add("hidden"), 1500);
+    if (!token) { window.location.href = "login.html"; return; }
+
+    try {
+      const pRes = await fetch(`${API}/protected/profile`, {
+        headers: { "Authorization": "Bearer " + token }
+      });
+      if (!pRes.ok) { logout(); return; }
+      const { user } = await pRes.json();
+      currentUser = user;
+
+      document.getElementById("sidebarAvatar").textContent = user.username[0].toUpperCase();
+      document.getElementById("sidebarName").textContent = user.username;
+      document.getElementById("sidebarEmail").textContent = user.email;
+
+      renderAll(user);
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to load tasks ❌", "error");
+    }
+  };
+
+  function renderAll(user) {
+    const tasks = user.tasks || {};
+    const done = TASKS_CONFIG.filter(t => tasks[t.key]).length;
+    const ptsEarned = TASKS_CONFIG.filter(t => tasks[t.key]).reduce((s, t) => s + t.pts, 0);
+    const ptsRemaining = TASKS_CONFIG.filter(t => !tasks[t.key]).reduce((s, t) => s + t.pts, 0);
+    const pct = Math.round((done / TASKS_CONFIG.length) * 100);
+
+    // Summary
+    document.getElementById("doneCount").textContent = `${done}/${TASKS_CONFIG.length}`;
+    document.getElementById("ptsEarned").textContent = ptsEarned;
+    document.getElementById("ptsRemaining").textContent = ptsRemaining;
+
+    // Progress
+    document.getElementById("progressLabel").textContent = `${done} / ${TASKS_CONFIG.length} tasks`;
+    document.getElementById("progressPct").textContent = `${pct}%`;
+    setTimeout(() => {
+      document.getElementById("progressBar").style.width = pct + "%";
+    }, 200);
+
+    // Tasks grid
+    const grid = document.getElementById("tasksGrid");
+    grid.innerHTML = "";
+    TASKS_CONFIG.forEach((t, i) => {
+      const isDone = !!tasks[t.key];
+      const card = document.createElement("div");
+      card.className = `task-card ${isDone ? "completed" : ""}`;
+      card.style.animationDelay = `${0.5 + i * 0.1}s`;
+      card.innerHTML = `
+        <div class="task-card-top">
+          <div class="task-card-icon ${isDone ? "done" : "pending"}">${t.icon}</div>
+          <div class="task-card-info">
+            <div class="task-card-title">${t.title}</div>
+            <div class="task-card-desc">${t.desc}</div>
+          </div>
+          <div class="task-pts-badge">+${t.pts}</div>
+        </div>
+        <div class="task-card-bottom">
+          <div class="task-status ${isDone ? "done" : "pending"}">
+            <div class="task-status-dot"></div>
+            ${isDone ? "Completed" : "Pending"}
+          </div>
+          ${isDone
+            ? `<div class="btn-done">✓ Done</div>`
+            : t.autoComplete
+              ? `<div class="btn-done" style="color:var(--muted);border-color:var(--border)">Auto</div>`
+              : `<button class="btn-complete" id="btn-${t.key}" onclick="completeTask('${t.key}', ${t.pts})">Complete</button>`
+          }
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  async function completeTask(taskKey, pts) {
+    const btn = document.getElementById(`btn-${taskKey}`);
+    if (btn) { btn.disabled = true; btn.textContent = "..."; }
+
+    try {
+      const res = await fetch(`${API}/protected/task`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+        body: JSON.stringify({ taskKey })
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        showToast(`✅ +${pts} pts earned!`, "success");
+        currentUser.tasks = data.tasks;
+        currentUser.points = data.points;
+        renderAll(currentUser);
+      } else {
+        showToast(data.message || "Error", "error");
+        if (btn) { btn.disabled = false; btn.textContent = "Complete"; }
+      }
+    } catch (err) {
+      showToast("Network error ❌", "error");
+      if (btn) { btn.disabled = false; btn.textContent = "Complete"; }
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem("token");
+    window.location.href = "login.html";
+  }
+
+  function showToast(msg, type = "") {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => t.classList.remove("show"), 2500);
+  }
+</script>
+</body>
+</html>

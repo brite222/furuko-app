@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FUKURO — Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #060608; --surface: #0e0e14; --card: #13131c; --card2: #181824;
+      --border: rgba(255,255,255,0.07); --accent: #c8f542; --accent2: #42f5c8;
+      --accent3: #f542a4; --text: #f0f0f8; --muted: #5a5a72; --muted2: #8888aa;
+      --font-display: 'Bebas Neue', sans-serif; --font-body: 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; overflow-x: hidden; }
+    .bg-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(200,245,66,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(200,245,66,0.03) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; z-index: 0; }
+    .bg-glow { position: fixed; top: -300px; left: 50%; transform: translateX(-50%); width: 900px; height: 600px; background: radial-gradient(ellipse, rgba(200,245,66,0.06) 0%, transparent 65%); pointer-events: none; z-index: 0; }
+    .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; position: relative; z-index: 1; }
+    .sidebar { grid-row: 1 / -1; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 32px 0; position: sticky; top: 0; height: 100vh; }
+    .logo { padding: 0 24px 32px; border-bottom: 1px solid var(--border); }
+    .logo-text { font-family: var(--font-display); font-size: 36px; letter-spacing: 4px; color: var(--accent); line-height: 1; }
+    .logo-sub { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
+    .nav { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+    .nav-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; padding: 0 8px; margin: 12px 0 6px; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; color: var(--muted2); font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; border: 1px solid transparent; }
+    .nav-item:hover { color: var(--text); background: var(--card); }
+    .nav-item.active { color: var(--accent); background: rgba(200,245,66,0.08); border-color: rgba(200,245,66,0.15); }
+    .nav-item .icon { width: 18px; text-align: center; font-size: 16px; }
+    .nav-item .badge { margin-left: auto; background: var(--accent3); color: #000; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; font-family: var(--font-mono); }
+    .sidebar-bottom { padding: 16px; border-top: 1px solid var(--border); }
+    .user-chip { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--card); border-radius: 10px; border: 1px solid var(--border); }
+    .avatar-sm { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #000; flex-shrink: 0; overflow: hidden; }
+    .avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
+    .user-info { flex: 1; min-width: 0; }
+    .user-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-email { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .logout-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; transition: color 0.2s; }
+    .logout-btn:hover { color: #fa6d6d; }
+
+    .content { padding: 32px; overflow-y: auto; }
+    .page-title { font-family: var(--font-display); font-size: 40px; letter-spacing: 3px; margin-bottom: 32px; }
+
+    .profile-grid { display: grid; grid-template-columns: 320px 1fr; gap: 24px; }
+
+    /* LEFT COLUMN */
+    .profile-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 32px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .avatar-wrap { position: relative; cursor: pointer; }
+    .avatar-lg { width: 100px; height: 100px; border-radius: 20px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 48px; color: #000; overflow: hidden; border: 3px solid rgba(200,245,66,0.3); }
+    .avatar-lg img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); border-radius: 20px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; font-size: 24px; }
+    .avatar-wrap:hover .avatar-overlay { opacity: 1; }
+    #avatarInput { display: none; }
+    .profile-username { font-family: var(--font-display); font-size: 28px; letter-spacing: 2px; }
+    .profile-email { font-size: 13px; color: var(--muted2); }
+
+    .stats-mini { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; margin-top: 8px; }
+    .stat-mini { background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 8px; text-align: center; }
+    .stat-mini-val { font-family: var(--font-display); font-size: 22px; color: var(--accent); }
+    .stat-mini-label { font-size: 10px; color: var(--muted); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+    .wallet-display { width: 100%; background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+    .wallet-addr { font-family: var(--font-mono); font-size: 11px; color: var(--accent2); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .wallet-none { color: var(--muted); font-size: 12px; }
+    .copy-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; transition: color 0.2s; }
+    .copy-btn:hover { color: var(--accent); }
+
+    /* RIGHT COLUMN */
+    .forms-col { display: flex; flex-direction: column; gap: 20px; }
+    .form-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+    .form-card-title { font-family: var(--font-display); font-size: 20px; letter-spacing: 1px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 12px; font-family: var(--font-mono); color: var(--muted2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .form-input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; color: var(--text); font-family: var(--font-body); font-size: 14px; outline: none; transition: border-color 0.2s; }
+    .form-input:focus { border-color: var(--accent); }
+    .form-input::placeholder { color: var(--muted); }
+    .btn { padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-family: var(--font-body); font-weight: 600; font-size: 14px; transition: all 0.2s; width: 100%; }
+    .btn-accent { background: var(--accent); color: #000; }
+    .btn-accent:hover { background: #d4ff44; transform: translateY(-1px); }
+    .btn-danger { background: rgba(245,66,66,0.12); color: #fa6d6d; border: 1px solid rgba(245,66,66,0.25); }
+    .btn-danger:hover { background: rgba(245,66,66,0.2); }
+
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 14px; z-index: 200; transform: translateY(80px); opacity: 0; transition: all 0.3s ease; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-color: rgba(200,245,66,0.3); }
+    .toast.error { border-color: rgba(250,109,109,0.3); }
+
+    .loading-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; transition: opacity 0.5s, visibility 0.5s; }
+    .loading-overlay.hidden { opacity: 0; visibility: hidden; }
+    .loading-logo { font-family: var(--font-display); font-size: 64px; letter-spacing: 8px; color: var(--accent); animation: flicker 1.5s ease infinite; }
+    @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .loading-bar-wrap { width: 200px; height: 2px; background: var(--border); border-radius: 2px; margin-top: 24px; overflow: hidden; }
+    .loading-bar { height: 100%; background: var(--accent); border-radius: 2px; animation: loadBar 1.5s ease forwards; }
+    @keyframes loadBar { from { width: 0; } to { width: 100%; } }
+
+    @media (max-width: 1000px) { .profile-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .app { grid-template-columns: 1fr; } .sidebar { display: none; } .content { padding: 16px; } }
+  </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loader">
+  <div class="loading-logo">FUKURO</div>
+  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+</div>
+
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+<div class="toast" id="toast"></div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-text">FUKURO</div>
+      <div class="logo-sub">Ecosystem Dashboard</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-label">Main</div>
+      <a class="nav-item" href="dashboard.html"><span class="icon">⚡</span> Dashboard</a>
+      <a class="nav-item" href="leaderboard.html"><span class="icon">🏆</span> Leaderboard <span class="badge">LIVE</span></a>
+      <a class="nav-item" href="dashboard.html#wallet"><span class="icon">💼</span> Wallet</a>
+      <div class="nav-label">Activity</div>
+      <a class="nav-item" href="#"><span class="icon">✅</span> Tasks</a>
+      <a class="nav-item" href="#"><span class="icon">📈</span> Points History</a>
+      <div class="nav-label">Account</div>
+      <a class="nav-item active" href="profile.html"><span class="icon">👤</span> Profile</a>
+      <a class="nav-item" href="#"><span class="icon">⚙️</span> Settings</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-chip">
+        <div class="avatar-sm" id="sidebarAvatar">?</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebarName">Loading...</div>
+          <div class="user-email" id="sidebarEmail">—</div>
+        </div>
+        <button class="logout-btn" onclick="logout()" title="Logout">⏻</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="content">
+    <div class="page-title">PROFILE</div>
+
+    <div class="profile-grid">
+
+      <!-- LEFT: Avatar + Stats -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="profile-card">
+          <div class="avatar-wrap" onclick="document.getElementById('avatarInput').click()">
+            <div class="avatar-lg" id="avatarLg">?</div>
+            <div class="avatar-overlay">📷</div>
+          </div>
+          <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatar(event)">
+          <div class="profile-username" id="profileUsername">—</div>
+          <div class="profile-email" id="profileEmail">—</div>
+
+          <div class="stats-mini">
+            <div class="stat-mini">
+              <div class="stat-mini-val" id="statPoints">0</div>
+              <div class="stat-mini-label">Points</div>
+            </div>
+            <div class="stat-mini">
+              <div class="stat-mini-val" id="statRank">#—</div>
+              <div class="stat-mini-label">Rank</div>
+            </div>
+            <div class="stat-mini">
+              <div class="stat-mini-val" id="statStreak">0</div>
+              <div class="stat-mini-label">Streak</div>
+            </div>
+          </div>
+
+          <div class="wallet-display">
+            <span>💼</span>
+            <span class="wallet-addr" id="walletAddr"><span class="wallet-none">No wallet connected</span></span>
+            <button class="copy-btn" onclick="copyWallet()">⎘</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Edit Forms -->
+      <div class="forms-col">
+
+        <!-- Edit Profile -->
+        <div class="form-card">
+          <div class="form-card-title">✏️ Edit Profile</div>
+          <div class="form-group">
+            <label>Username</label>
+            <input class="form-input" id="inputUsername" placeholder="Enter username" />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input class="form-input" id="inputEmail" type="email" placeholder="Enter email" />
+          </div>
+          <button class="btn btn-accent" onclick="updateProfile()">Save Changes</button>
+        </div>
+
+        <!-- Change Password -->
+        <div class="form-card">
+          <div class="form-card-title">🔒 Change Password</div>
+          <div class="form-group">
+            <label>Current Password</label>
+            <input class="form-input" id="currentPassword" type="password" placeholder="Enter current password" />
+          </div>
+          <div class="form-group">
+            <label>New Password</label>
+            <input class="form-input" id="newPassword" type="password" placeholder="Enter new password" />
+          </div>
+          <div class="form-group">
+            <label>Confirm New Password</label>
+            <input class="form-input" id="confirmPassword" type="password" placeholder="Confirm new password" />
+          </div>
+          <button class="btn btn-accent" onclick="changePassword()">Update Password</button>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="form-card">
+          <div class="form-card-title">⚠️ Danger Zone</div>
+          <button class="btn btn-danger" onclick="confirmLogout()">Logout of all devices</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = "http://127.0.0.1:5000/api";
+  const token = localStorage.getItem("token");
+  let currentUser = null;
+
+  window.onload = async () => {
+    setTimeout(() => document.getElementById("loader").classList.add("hidden"), 1500);
+    if (!token) { window.location.href = "login.html"; return; }
+
+    try {
+      const res = await fetch(`${API}/protected/profile`, {
+        headers: { "Authorization": "Bearer " + token }
+      });
+      if (!res.ok) { logout(); return; }
+      const { user } = await res.json();
+      currentUser = user;
+      loadProfile(user);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  function loadProfile(user) {
+    // Sidebar
+    document.getElementById("sidebarName").textContent  = user.username;
+    document.getElementById("sidebarEmail").textContent = user.email;
+
+    // Avatar
+    const savedAvatar = localStorage.getItem("avatar_" + user._id);
+    if (savedAvatar) {
+      setAvatarImage(savedAvatar);
+    } else {
+      document.getElementById("avatarLg").textContent       = user.username[0].toUpperCase();
+      document.getElementById("sidebarAvatar").textContent  = user.username[0].toUpperCase();
+    }
+
+    // Profile info
+    document.getElementById("profileUsername").textContent = user.username;
+    document.getElementById("profileEmail").textContent    = user.email;
+    document.getElementById("inputUsername").value         = user.username;
+    document.getElementById("inputEmail").value            = user.email;
+
+    // Stats
+    document.getElementById("statPoints").textContent = user.points?.toLocaleString() || 0;
+    document.getElementById("statRank").textContent   = "#" + (user.rank || "—");
+    document.getElementById("statStreak").textContent = user.streak || 0;
+
+    // Wallet
+    if (user.wallet) {
+      document.getElementById("walletAddr").textContent = user.wallet;
+      document.getElementById("walletAddr").style.color = "var(--accent2)";
+    }
+  }
+
+  function handleAvatar(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target.result;
+      localStorage.setItem("avatar_" + currentUser._id, base64);
+      setAvatarImage(base64);
+      showToast("📷 Avatar updated!", "success");
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function setAvatarImage(src) {
+    const lg = document.getElementById("avatarLg");
+    const sm = document.getElementById("sidebarAvatar");
+    lg.innerHTML  = `<img src="${src}" alt="avatar">`;
+    sm.innerHTML  = `<img src="${src}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`;
+  }
+
+  async function updateProfile() {
+    const username = document.getElementById("inputUsername").value.trim();
+    const email    = document.getElementById("inputEmail").value.trim();
+    if (!username || !email) { showToast("⚠️ All fields required", "error"); return; }
+
+    try {
+      const res = await fetch(`${API}/protected/profile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({ username, email })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        document.getElementById("profileUsername").textContent = username;
+        document.getElementById("profileEmail").textContent    = email;
+        document.getElementById("sidebarName").textContent     = username;
+        document.getElementById("sidebarEmail").textContent    = email;
+        showToast("✅ Profile updated!", "success");
+      } else {
+        showToast(data.message, "error");
+      }
+    } catch (err) {
+      showToast("Network error ❌", "error");
+    }
+  }
+
+  async function changePassword() {
+    const currentPassword = document.getElementById("currentPassword").value;
+    const newPassword     = document.getElementById("newPassword").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      showToast("⚠️ All fields required", "error"); return;
+    }
+    if (newPassword !== confirmPassword) {
+      showToast("❌ Passwords don't match", "error"); return;
+    }
+    if (newPassword.length < 4) {
+      showToast("❌ Password too short", "error"); return;
+    }
+
+    try {
+      const res = await fetch(`${API}/protected/password`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        document.getElementById("currentPassword").value = "";
+        document.getElementById("newPassword").value     = "";
+        document.getElementById("confirmPassword").value = "";
+        showToast("🔒 Password changed!", "success");
+      } else {
+        showToast(data.message, "error");
+      }
+    } catch (err) {
+      showToast("Network error ❌", "error");
+    }
+  }
+
+  function copyWallet() {
+    const addr = document.getElementById("walletAddr").textContent;
+    if (addr === "No wallet connected") return;
+    navigator.clipboard.writeText(addr);
+    showToast("📋 Address copied!", "success");
+  }
+
+  function confirmLogout() {
+    if (confirm("Are you sure you want to logout?")) logout();
+  }
+
+  function logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "login.html";
+  }
+
+  function showToast(msg, type = "") {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => t.classList.remove("show"), 2500);
+  }
+</script>
+</body>
+</html>

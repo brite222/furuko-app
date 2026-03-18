@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FUKURO — Register</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #060608; --surface: #0e0e14; --card: #13131c;
+      --border: rgba(255,255,255,0.07); --accent: #c8f542;
+      --accent2: #42f5c8; --accent3: #f542a4; --text: #f0f0f8;
+      --muted: #5a5a72; --muted2: #8888aa;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-body: 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; }
+    .left { position: relative; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between; padding: 48px; overflow: hidden; }
+    .left::before { content: ''; position: absolute; top: -200px; right: -200px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(245,66,164,0.07) 0%, transparent 65%); pointer-events: none; }
+    .left::after { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(200,245,66,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(200,245,66,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
+    .left-logo { position: relative; z-index: 1; }
+    .logo-text { font-family: var(--font-display); font-size: 48px; letter-spacing: 6px; color: var(--accent); line-height: 1; }
+    .logo-sub { font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-top: 6px; }
+    .left-content { position: relative; z-index: 1; }
+    .left-title { font-family: var(--font-display); font-size: 52px; line-height: 1.1; letter-spacing: 2px; margin-bottom: 20px; }
+    .left-title span { color: var(--accent3); }
+    .left-desc { font-size: 15px; color: var(--muted2); line-height: 1.7; max-width: 380px; margin-bottom: 32px; }
+    .perks { display: flex; flex-direction: column; gap: 12px; }
+    .perk { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--muted2); }
+    .perk-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(200,245,66,0.08); border: 1px solid rgba(200,245,66,0.15); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .left-footer { position: relative; z-index: 1; font-family: var(--font-mono); font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 6px var(--accent); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .right { display: flex; align-items: center; justify-content: center; padding: 48px; position: relative; overflow-y: auto; }
+    .auth-box { width: 100%; max-width: 420px; animation: fadeUp 0.6s ease both; padding: 16px 0; }
+    @keyframes fadeUp { from { transform: translateY(24px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .auth-tag { font-family: var(--font-mono); font-size: 11px; color: var(--accent3); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .auth-tag::before { content: ''; width: 24px; height: 1px; background: var(--accent3); }
+    .auth-title { font-family: var(--font-display); font-size: 44px; letter-spacing: 2px; line-height: 1; margin-bottom: 8px; }
+    .auth-sub { font-size: 14px; color: var(--muted2); margin-bottom: 32px; }
+    .alert { display: none; padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 500; margin-bottom: 20px; border: 1px solid transparent; }
+    .alert.show { display: flex; align-items: center; gap: 8px; }
+    .alert-success { background: rgba(200,245,66,0.08); border-color: rgba(200,245,66,0.25); color: var(--accent); }
+    .alert-error { background: rgba(250,109,109,0.08); border-color: rgba(250,109,109,0.25); color: #fa6d6d; }
+    .ref-badge { display: none; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(200,245,66,0.06); border: 1px solid rgba(200,245,66,0.2); border-radius: 8px; font-size: 12px; color: var(--accent); font-family: var(--font-mono); margin-bottom: 16px; }
+    .ref-badge.show { display: flex; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; display: block; }
+    .form-input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 13px 16px; color: var(--text); font-family: var(--font-body); font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    .form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(200,245,66,0.08); }
+    .form-input::placeholder { color: var(--muted); }
+    .input-wrap { position: relative; }
+    .toggle-pw { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; transition: color 0.2s; }
+    .toggle-pw:hover { color: var(--accent); }
+    .btn-submit { width: 100%; padding: 15px; background: var(--accent); color: #000; border: none; border-radius: 10px; font-family: var(--font-body); font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.2s; margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-submit:hover { background: #d4ff44; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(200,245,66,0.2); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .spinner { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.3); border-top-color: #000; border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .terms { font-size: 12px; color: var(--muted); text-align: center; margin-top: 14px; line-height: 1.6; }
+    .auth-footer { text-align: center; margin-top: 20px; font-size: 13px; color: var(--muted2); }
+    .auth-footer a { color: var(--accent); text-decoration: none; font-weight: 600; }
+    @media (max-width: 900px) { body { grid-template-columns: 1fr; } .left { display: none; } .right { padding: 32px 24px; } }
+  </style>
+</head>
+<body>
+  <div class="left">
+    <div class="left-logo">
+      <div class="logo-text">FUKURO</div>
+      <div class="logo-sub">Ecosystem Platform</div>
+    </div>
+    <div class="left-content">
+      <div class="left-title">JOIN THE<br><span>ECOSYSTEM</span><br>TODAY</div>
+      <p class="left-desc">Create your account and start earning points, climbing the leaderboard, and building your reputation in the FUKURO ecosystem.</p>
+      <div class="perks">
+        <div class="perk"><div class="perk-icon">⚡</div>Earn points by completing tasks daily</div>
+        <div class="perk"><div class="perk-icon">🏆</div>Compete on the global leaderboard</div>
+        <div class="perk"><div class="perk-icon">💼</div>Connect your wallet for rewards</div>
+        <div class="perk"><div class="perk-icon">🔗</div>Refer friends and earn bonus points</div>
+      </div>
+    </div>
+    <div class="left-footer"><div class="live-dot"></div>Free to join — No credit card required</div>
+  </div>
+
+  <div class="right">
+    <div class="auth-box">
+      <div class="auth-tag">Create Account</div>
+      <div class="auth-title">GET STARTED</div>
+      <div class="auth-sub">Join thousands of users in the ecosystem</div>
+      <div class="ref-badge" id="refBadge">🔗 Referred by code: <strong id="refCodeDisplay"></strong></div>
+      <div class="alert" id="alert"></div>
+      <div class="form-group">
+        <label class="form-label">Username</label>
+        <input class="form-input" type="text" id="username" placeholder="your_username" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="email" placeholder="you@example.com" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="input-wrap">
+          <input class="form-input" type="password" id="password" placeholder="••••••••" />
+          <button class="toggle-pw" type="button" onclick="togglePassword()">👁</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Referral Code <span style="color:var(--muted);font-size:10px;">(optional)</span></label>
+        <input class="form-input" type="text" id="referralCode" placeholder="e.g. JOHN4X2K" style="text-transform:uppercase;" />
+      </div>
+      <button class="btn-submit" id="btn" onclick="register()">Create Account</button>
+      <div class="terms">By creating an account you agree to the FUKURO Terms of Service</div>
+      <div class="auth-footer">Already have an account? <a href="login.html">Login →</a></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get("ref");
+      if (ref) {
+        document.getElementById("referralCode").value = ref.toUpperCase();
+        document.getElementById("refCodeDisplay").textContent = ref.toUpperCase();
+        document.getElementById("refBadge").classList.add("show");
+      }
+    });
+    function togglePassword() {
+      const pw = document.getElementById("password");
+      pw.type = pw.type === "password" ? "text" : "password";
+    }
+    function showAlert(message, type) {
+      const a = document.getElementById("alert");
+      a.className = "alert show alert-" + type;
+      a.innerHTML = (type === "success" ? "✅ " : "❌ ") + message;
+    }
+  </script>
+</body>
+</html>

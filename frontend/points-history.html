@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FUKURO — Points History</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #060608; --surface: #0e0e14; --card: #13131c; --card2: #181824;
+      --border: rgba(255,255,255,0.07); --accent: #c8f542; --accent2: #42f5c8;
+      --accent3: #f542a4; --text: #f0f0f8; --muted: #5a5a72; --muted2: #8888aa;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-body: 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; overflow-x: hidden; }
+    .bg-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(200,245,66,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(200,245,66,0.03) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; z-index: 0; }
+    .bg-glow { position: fixed; top: -300px; left: 50%; transform: translateX(-50%); width: 900px; height: 600px; background: radial-gradient(ellipse, rgba(200,245,66,0.05) 0%, transparent 65%); pointer-events: none; z-index: 0; }
+    .app { display: grid; grid-template-columns: 240px 1fr; grid-template-rows: auto 1fr; min-height: 100vh; position: relative; z-index: 1; }
+    .sidebar { grid-row: 1 / -1; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 32px 0; position: sticky; top: 0; height: 100vh; animation: slideInLeft 0.5s ease both; }
+    @keyframes slideInLeft { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .logo { padding: 0 24px 32px; border-bottom: 1px solid var(--border); }
+    .logo-text { font-family: var(--font-display); font-size: 36px; letter-spacing: 4px; color: var(--accent); line-height: 1; }
+    .logo-sub { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
+    .nav { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+    .nav-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; padding: 0 8px; margin: 12px 0 6px; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; color: var(--muted2); font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; border: 1px solid transparent; }
+    .nav-item:hover { color: var(--text); background: var(--card); }
+    .nav-item.active { color: var(--accent); background: rgba(200,245,66,0.08); border-color: rgba(200,245,66,0.15); }
+    .nav-item .icon { width: 18px; text-align: center; font-size: 16px; }
+    .nav-item .badge { margin-left: auto; background: var(--accent3); color: #000; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; font-family: var(--font-mono); }
+    .sidebar-bottom { padding: 16px; border-top: 1px solid var(--border); }
+    .user-chip { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--card); border-radius: 10px; border: 1px solid var(--border); }
+    .avatar { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #000; flex-shrink: 0; }
+    .user-info { flex: 1; min-width: 0; }
+    .user-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-email { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .logout-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; transition: color 0.2s; }
+    .logout-btn:hover { color: #fa6d6d; }
+    .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; height: 64px; display: flex; align-items: center; justify-content: space-between; animation: fadeDown 0.5s ease both; }
+    @keyframes fadeDown { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .page-title { font-family: var(--font-display); font-size: 28px; letter-spacing: 2px; }
+    .status-dot { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted2); font-family: var(--font-mono); }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); } }
+    .main { padding: 32px; display: flex; flex-direction: column; gap: 24px; overflow-y: auto; }
+    @keyframes fadeUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; animation: fadeUp 0.5s ease both; }
+    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .card-title { font-family: var(--font-display); font-size: 20px; letter-spacing: 1px; }
+    .card-badge { font-family: var(--font-mono); font-size: 11px; color: var(--muted); background: var(--card2); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); }
+
+    /* SUMMARY CARDS */
+    .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .summary-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; animation: fadeUp 0.5s ease both; transition: border-color 0.2s, transform 0.2s; }
+    .summary-card:hover { border-color: rgba(200,245,66,0.2); transform: translateY(-2px); }
+    .summary-card:nth-child(1) { animation-delay: 0.1s; }
+    .summary-card:nth-child(2) { animation-delay: 0.2s; }
+    .summary-card:nth-child(3) { animation-delay: 0.3s; }
+    .summary-icon { font-size: 22px; margin-bottom: 12px; }
+    .summary-value { font-family: var(--font-display); font-size: 40px; letter-spacing: 1px; line-height: 1; margin-bottom: 4px; color: var(--accent); }
+    .summary-label { font-size: 12px; color: var(--muted2); font-weight: 500; }
+
+    /* CHART */
+    .chart-wrap { height: 180px; display: flex; align-items: flex-end; gap: 6px; }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+    .bar { width: 100%; border-radius: 6px 6px 0 0; background: rgba(200,245,66,0.15); border: 1px solid rgba(200,245,66,0.2); transition: background 0.2s; cursor: pointer; animation: growBar 0.8s ease both; position: relative; }
+    .bar:hover { background: rgba(200,245,66,0.4); }
+    .bar.highlight { background: var(--accent); border-color: var(--accent); }
+    .bar-tooltip { display: none; position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: var(--card2); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-family: var(--font-mono); font-size: 11px; white-space: nowrap; color: var(--accent); z-index: 10; }
+    .bar:hover .bar-tooltip { display: block; }
+    @keyframes growBar { from { transform: scaleY(0); transform-origin: bottom; } to { transform: scaleY(1); transform-origin: bottom; } }
+    .bar-lbl { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+
+    /* HISTORY TABLE */
+    .history-table { width: 100%; border-collapse: collapse; }
+    .history-table th { font-family: var(--font-mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; padding: 0 16px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+    .history-table td { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 14px; }
+    .history-table tr:last-child td { border-bottom: none; }
+    .history-table tr { transition: background 0.15s; }
+    .history-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .pts-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-family: var(--font-mono); font-size: 12px; font-weight: 500; }
+    .pts-badge.positive { background: rgba(200,245,66,0.1); color: var(--accent); border: 1px solid rgba(200,245,66,0.2); }
+
+    .source-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--card2); border: 1px solid var(--border); border-radius: 6px; font-size: 12px; color: var(--muted2); }
+
+    .empty-state { text-align: center; padding: 48px; color: var(--muted2); }
+    .empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .empty-state p { font-size: 14px; }
+
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 14px; z-index: 200; transform: translateY(80px); opacity: 0; transition: all 0.3s ease; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    .loading-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; transition: opacity 0.5s, visibility 0.5s; }
+    .loading-overlay.hidden { opacity: 0; visibility: hidden; }
+    .loading-logo { font-family: var(--font-display); font-size: 64px; letter-spacing: 8px; color: var(--accent); animation: flicker 1.5s ease infinite; }
+    @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .loading-bar-wrap { width: 200px; height: 2px; background: var(--border); border-radius: 2px; margin-top: 24px; overflow: hidden; }
+    .loading-bar { height: 100%; background: var(--accent); border-radius: 2px; animation: loadBar 1.5s ease forwards; }
+    @keyframes loadBar { from { width: 0; } to { width: 100%; } }
+
+    @media (max-width: 768px) { .app { grid-template-columns: 1fr; } .sidebar { display: none; } .main { padding: 16px; } .summary-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loader">
+  <div class="loading-logo">FUKURO</div>
+  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+</div>
+
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+<div class="toast" id="toast"></div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-text">FUKURO</div>
+      <div class="logo-sub">Ecosystem Dashboard</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-label">Main</div>
+      <a class="nav-item" href="dashboard.html"><span class="icon">⚡</span> Dashboard</a>
+      <a class="nav-item" href="leaderboard.html"><span class="icon">🏆</span> Leaderboard <span class="badge">LIVE</span></a>
+      <a class="nav-item" href="dashboard.html#wallet"><span class="icon">💼</span> Wallet</a>
+      <div class="nav-label">Activity</div>
+      <a class="nav-item" href="tasks.html"><span class="icon">✅</span> Tasks</a>
+      <a class="nav-item active" href="points-history.html"><span class="icon">📈</span> Points History</a>
+      <div class="nav-label">Account</div>
+      <a class="nav-item" href="profile.html"><span class="icon">👤</span> Profile</a>
+      <a class="nav-item" href="settings.html"><span class="icon">⚙️</span> Settings</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-chip">
+        <div class="avatar" id="sidebarAvatar">?</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebarName">Loading...</div>
+          <div class="user-email" id="sidebarEmail">—</div>
+        </div>
+        <button class="logout-btn" onclick="logout()" title="Logout">⏻</button>
+      </div>
+    </div>
+  </aside>
+
+  <header class="topbar">
+    <div class="page-title">POINTS HISTORY</div>
+    <div class="status-dot"><div class="dot"></div><span>LIVE</span></div>
+  </header>
+
+  <main class="main">
+
+    <!-- SUMMARY -->
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-icon">⚡</div>
+        <div class="summary-value" id="totalPoints">0</div>
+        <div class="summary-label">Total Points Earned</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-icon">📅</div>
+        <div class="summary-value" id="activeDays" style="color:var(--accent2)">0</div>
+        <div class="summary-label">Active Days</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-icon">📊</div>
+        <div class="summary-value" id="avgPerDay" style="color:var(--accent3)">0</div>
+        <div class="summary-label">Avg Points / Day</div>
+      </div>
+    </div>
+
+    <!-- CHART -->
+    <div class="card" style="animation-delay:0.4s">
+      <div class="card-header">
+        <div class="card-title">30-DAY ACTIVITY</div>
+        <div class="card-badge" id="chartRange">Last 30 days</div>
+      </div>
+      <div class="chart-wrap" id="chart"></div>
+    </div>
+
+    <!-- HISTORY TABLE -->
+    <div class="card" style="animation-delay:0.5s">
+      <div class="card-header">
+        <div class="card-title">ACTIVITY LOG</div>
+        <div class="card-badge" id="entryCount">0 entries</div>
+      </div>
+      <div id="historyContent"></div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  const API = "http://127.0.0.1:5000/api";
+  const token = localStorage.getItem("token");
+
+  const SOURCE_MAP = {
+    loginToday:      { label: "Daily Login",       icon: "🔐" },
+    connectWallet:   { label: "Connected Wallet",  icon: "💼" },
+    completeProfile: { label: "Profile Completed", icon: "👤" },
+    referFriend:     { label: "Referral Bonus",    icon: "🔗" },
+    earn500Points:   { label: "500pts Milestone",  icon: "🏆" },
+    register:        { label: "Registration",      icon: "✨" },
+    default:         { label: "Points Earned",     icon: "⚡" }
+  };
+
+  window.onload = async () => {
+    setTimeout(() => document.getElementById("loader").classList.add("hidden"), 1500);
+    if (!token) { window.location.href = "login.html"; return; }
+
+    try {
+      // Load profile
+      const pRes = await fetch(`${API}/protected/profile`, {
+        headers: { "Authorization": "Bearer " + token }
+      });
+      if (!pRes.ok) { logout(); return; }
+      const { user } = await pRes.json();
+
+      document.getElementById("sidebarAvatar").textContent = user.username[0].toUpperCase();
+      document.getElementById("sidebarName").textContent = user.username;
+      document.getElementById("sidebarEmail").textContent = user.email;
+
+      // Load weekly (we'll use full pointsHistory from profile)
+      const history = user.pointsHistory || [];
+
+      renderSummary(user.points, history);
+      renderChart(history);
+      renderTable(history);
+
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to load history ❌", "error");
+    }
+  };
+
+  function renderSummary(totalPoints, history) {
+    document.getElementById("totalPoints").textContent = totalPoints.toLocaleString();
+    const activeDays = history.filter(d => d.points > 0).length;
+    document.getElementById("activeDays").textContent = activeDays;
+    const avg = activeDays > 0 ? Math.round(totalPoints / activeDays) : 0;
+    document.getElementById("avgPerDay").textContent = avg;
+  }
+
+  function renderChart(history) {
+    const chart = document.getElementById("chart");
+    chart.innerHTML = "";
+
+    // Build last 30 days
+    const days = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split("T")[0];
+      const entry = history.find(h => h.date === dateStr);
+      days.push({ date: dateStr, points: entry ? entry.points : 0 });
+    }
+
+    const max = Math.max(...days.map(d => d.points)) || 1;
+
+    days.forEach((day, i) => {
+      const d = new Date(day.date + "T00:00:00");
+      const label = d.getDate();
+      const isToday = day.date === new Date().toISOString().split("T")[0];
+
+      const col = document.createElement("div");
+      col.className = "bar-col";
+      col.innerHTML = `
+        <div class="bar ${isToday ? "highlight" : ""}"
+          style="height:${Math.max((day.points / max) * 100, day.points > 0 ? 5 : 2)}%; animation-delay:${i * 0.02}s">
+          <div class="bar-tooltip">${day.points} pts</div>
+        </div>
+        <div class="bar-lbl">${i % 5 === 0 ? label : ""}</div>
+      `;
+      chart.appendChild(col);
+    });
+  }
+
+  function renderTable(history) {
+    const content = document.getElementById("historyContent");
+    document.getElementById("entryCount").textContent = `${history.length} entries`;
+
+    if (!history.length) {
+      content.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📭</div>
+          <p>No points history yet. Start completing tasks to earn points!</p>
+        </div>`;
+      return;
+    }
+
+    // Sort newest first
+    const sorted = [...history].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    const table = document.createElement("table");
+    table.className = "history-table";
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Source</th>
+          <th>Points</th>
+          <th>Day Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${sorted.map(entry => {
+          const src = SOURCE_MAP.default;
+          const date = new Date(entry.date + "T00:00:00");
+          const dateLabel = date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+          const isToday = entry.date === new Date().toISOString().split("T")[0];
+
+          return `
+            <tr>
+              <td>
+                <div style="font-weight:600">${dateLabel}</div>
+                <div style="font-size:11px;color:var(--muted);font-family:var(--font-mono)">${entry.date} ${isToday ? '<span style="color:var(--accent)">• TODAY</span>' : ""}</div>
+              </td>
+              <td>
+                <span class="source-badge">${src.icon} ${src.label}</span>
+              </td>
+              <td>
+                <span class="pts-badge positive">+${entry.points}</span>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:13px;color:var(--accent)">
+                ${entry.points} pts
+              </td>
+            </tr>
+          `;
+        }).join("")}
+      </tbody>
+    `;
+    content.appendChild(table);
+  }
+
+  function logout() {
+    localStorage.removeItem("token");
+    window.location.href = "login.html";
+  }
+
+  function showToast(msg, type = "") {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => t.classList.remove("show"), 2500);
+  }
+</script>
+</body>
+</html>
