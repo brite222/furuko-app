@@ -103,7 +103,33 @@
     .loading-bar { height: 100%; background: var(--accent); border-radius: 2px; animation: loadBar 1.5s ease forwards; }
     @keyframes loadBar { from { width: 0; } to { width: 100%; } }
 
-    @media (max-width: 768px) { .app { grid-template-columns: 1fr; } .sidebar { display: none; } .main { padding: 16px; } .summary-grid { grid-template-columns: 1fr; } }
+   .hamburger {
+  display: none;
+  flex-direction: column; justify-content: center; align-items: center;
+  gap: 5px; width: 40px; height: 40px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 8px; cursor: pointer;
+  transition: border-color 0.2s;
+}
+.hamburger:hover { border-color: rgba(200,245,66,0.3); }
+.hamburger span { display: block; width: 18px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.3s ease; }
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 49; opacity: 0; transition: opacity 0.3s ease; }
+.sidebar-overlay.show { opacity: 1; }
+
+@media (max-width: 768px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar { display: flex; position: fixed; left: 0; top: 0; height: 100vh; width: 260px; transform: translateX(-100%); transition: transform 0.3s ease; z-index: 50; }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-overlay { display: block; }
+  .hamburger { display: flex; }
+  .topbar { padding: 0 16px; }
+  .main { padding: 16px; }
+  .summary-grid { grid-template-columns: 1fr; }
+  .tasks-grid { grid-template-columns: 1fr; }
+}
   </style>
 </head>
 <body>
@@ -116,6 +142,7 @@
 <div class="bg-grid"></div>
 <div class="bg-glow"></div>
 <div class="toast" id="toast"></div>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
 <div class="app">
   <aside class="sidebar">
@@ -147,10 +174,15 @@
     </div>
   </aside>
 
-  <header class="topbar">
+ <header class="topbar">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+      <span></span><span></span><span></span>
+    </button>
     <div class="page-title">POINTS HISTORY</div>
-    <div class="status-dot"><div class="dot"></div><span>LIVE</span></div>
-  </header>
+  </div>
+  <div class="status-dot"><div class="dot"></div><span>LIVE</span></div>
+</header>
 
   <main class="main">
 
@@ -194,7 +226,7 @@
   </main>
 </div>
 
-<script>12
+<script>
   const API = "https://zestful-wisdom-production-c5b7.up.railway.app/api";
   const token = localStorage.getItem("token");
 
@@ -347,6 +379,21 @@
     t.className = `toast ${type} show`;
     setTimeout(() => t.classList.remove("show"), 2500);
   }
+  function toggleSidebar() {
+  document.getElementById("sidebar").classList.toggle("open");
+  document.getElementById("sidebarOverlay").classList.toggle("show");
+  document.getElementById("hamburger").classList.toggle("open");
+}
+function closeSidebar() {
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("sidebarOverlay").classList.remove("show");
+  document.getElementById("hamburger").classList.remove("open");
+}
+document.querySelectorAll(".nav-item").forEach(item => {
+  item.addEventListener("click", () => {
+    if (window.innerWidth <= 768) closeSidebar();
+  });
+});
 </script>
 </body>
 </html>

@@ -8,7 +8,6 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// ✅ Welcome email
 async function sendWelcomeEmail(to, username) {
   await transporter.sendMail({
     from: `"FUKURO APP" <${process.env.EMAIL_USER}>`,
@@ -27,7 +26,7 @@ async function sendWelcomeEmail(to, username) {
           <p style="color:#8888aa;margin:4px 0;">💼 Connect your wallet for +50 pts</p>
           <p style="color:#8888aa;margin:4px 0;">🏆 Climb the leaderboard</p>
         </div>
-        <a href="http://127.0.0.1:5500/frontend/dashboard.html" 
+        <a href="https://fukuuroo.com/dashboard.html" 
            style="display:inline-block;background:#c8f542;color:#000;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;">
           Open Dashboard →
         </a>
@@ -38,7 +37,6 @@ async function sendWelcomeEmail(to, username) {
   });
 }
 
-// ✅ Streak reminder
 async function sendStreakReminder(to, username, streak) {
   await transporter.sendMail({
     from: `"FUKURO APP" <${process.env.EMAIL_USER}>`,
@@ -55,7 +53,7 @@ async function sendStreakReminder(to, username, streak) {
           <p style="font-family:monospace;font-size:36px;color:#f5a442;margin:8px 0;">${streak} DAYS</p>
           <p style="color:#8888aa;font-size:14px;">Don't let it go to waste!</p>
         </div>
-        <a href="http://127.0.0.1:5500/frontend/login.html"
+        <a href="https://fukuuroo.com/login.html"
            style="display:inline-block;background:#f5a442;color:#000;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;">
           Login Now →
         </a>
@@ -82,7 +80,7 @@ async function sendReferralEmail(to, referrerUsername, newUsername) {
           <p style="font-family:monospace;font-size:36px;color:#c8f542;margin:8px 0;">+100 PTS</p>
           <p style="color:#8888aa;font-size:14px;">Added to your account!</p>
         </div>
-        <a href="http://127.0.0.1:5500/frontend/dashboard.html"
+        <a href="https://fukuuroo.com/dashboard.html"
            style="display:inline-block;background:#c8f542;color:#000;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;">
           View Dashboard →
         </a>
@@ -93,9 +91,6 @@ async function sendReferralEmail(to, referrerUsername, newUsername) {
   });
 }
 
-module.exports = { sendWelcomeEmail, sendStreakReminder, sendRankChangeEmail, sendReferralEmail };
-
-// ✅ Rank change alert
 async function sendRankChangeEmail(to, username, oldRank, newRank) {
   const improved = newRank < oldRank;
   await transporter.sendMail({
@@ -108,18 +103,20 @@ async function sendRankChangeEmail(to, username, oldRank, newRank) {
         <hr style="border:1px solid rgba(255,255,255,0.07);margin:24px 0;">
         <h2 style="color:${improved ? "#c8f542" : "#f542a4"};">${improved ? "🏆 Rank Up!" : "📉 Rank Drop"}</h2>
         <p style="color:#8888aa;line-height:1.6;">Hey <strong style="color:#f0f0f8;">${username}</strong>, your leaderboard rank just changed!</p>
-        <div style="background:#13131c;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:24px;margin:24px 0;display:flex;align-items:center;justify-content:center;gap:24px;text-align:center;">
-          <div>
-            <p style="color:#8888aa;font-size:12px;text-transform:uppercase;letter-spacing:2px;">Before</p>
-            <p style="font-family:monospace;font-size:36px;color:#8888aa;">#${oldRank}</p>
-          </div>
-          <p style="font-size:24px;">${improved ? "→" : "→"}</p>
-          <div>
-            <p style="color:#8888aa;font-size:12px;text-transform:uppercase;letter-spacing:2px;">Now</p>
-            <p style="font-family:monospace;font-size:36px;color:${improved ? "#c8f542" : "#f542a4"};">#${newRank}</p>
+        <div style="background:#13131c;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:24px;margin:24px 0;text-align:center;">
+          <div style="display:inline-flex;align-items:center;gap:24px;">
+            <div>
+              <p style="color:#8888aa;font-size:12px;text-transform:uppercase;letter-spacing:2px;">Before</p>
+              <p style="font-family:monospace;font-size:36px;color:#8888aa;">#${oldRank}</p>
+            </div>
+            <p style="font-size:24px;">→</p>
+            <div>
+              <p style="color:#8888aa;font-size:12px;text-transform:uppercase;letter-spacing:2px;">Now</p>
+              <p style="font-family:monospace;font-size:36px;color:${improved ? "#c8f542" : "#f542a4"};">#${newRank}</p>
+            </div>
           </div>
         </div>
-        <a href="http://127.0.0.1:5500/frontend/leaderboard.html"
+        <a href="https://fukuuroo.com/leaderboard.html"
            style="display:inline-block;background:#c8f542;color:#000;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;">
           View Leaderboard →
         </a>
@@ -130,4 +127,5 @@ async function sendRankChangeEmail(to, username, oldRank, newRank) {
   });
 }
 
-module.exports = { sendWelcomeEmail, sendStreakReminder, sendRankChangeEmail };
+// ✅ Single export at the bottom
+module.exports = { sendWelcomeEmail, sendStreakReminder, sendRankChangeEmail, sendReferralEmail };
