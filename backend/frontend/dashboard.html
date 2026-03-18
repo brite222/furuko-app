@@ -197,7 +197,12 @@
       .sidebar-overlay { display: block; }
       .hamburger { display: flex; }
       .topbar { padding: 0 16px; height: 56px; }
-      .main { padding: 16px; gap: 16px; }
+      /* ✅ KEY FIX: safe-area padding for mobile browsers */
+      .main {
+        padding: 16px;
+        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 80px);
+        gap: 16px;
+      }
       .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
       .stat-value { font-size: 28px; }
       .stat-card { padding: 14px; }
@@ -210,7 +215,7 @@
       .wallet-input-wrap .btn { flex: 1; }
       .ref-link-row { flex-direction: column; }
       .ref-link-row .btn { width: 100%; }
-      .toast { right: 12px; left: 12px; }
+      .toast { right: 12px; left: 12px; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); }
     }
 
     @media (max-width: 480px) {
