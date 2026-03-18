@@ -9,152 +9,70 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #060608;
-      --surface: #0e0e14;
-      --card: #13131c;
-      --card2: #181824;
-      --border: rgba(255,255,255,0.07);
-      --accent: #c8f542;
-      --accent2: #42f5c8;
-      --accent3: #f542a4;
-      --text: #f0f0f8;
-      --muted: #5a5a72;
-      --muted2: #8888aa;
-      --font-display: 'Bebas Neue', sans-serif;
-      --font-body: 'Outfit', sans-serif;
+      --bg: #060608; --surface: #0e0e14; --card: #13131c; --card2: #181824;
+      --border: rgba(255,255,255,0.07); --accent: #c8f542; --accent2: #42f5c8;
+      --accent3: #f542a4; --text: #f0f0f8; --muted: #5a5a72; --muted2: #8888aa;
+      --font-display: 'Bebas Neue', sans-serif; --font-body: 'Outfit', sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
     }
 
     html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; overflow-x: hidden; }
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-body);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+    .bg-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(200,245,66,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(200,245,66,0.03) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; z-index: 0; }
+    .bg-glow { position: fixed; top: -300px; left: 50%; transform: translateX(-50%); width: 900px; height: 600px; background: radial-gradient(ellipse, rgba(200,245,66,0.06) 0%, transparent 65%); pointer-events: none; z-index: 0; }
 
-    .bg-grid {
-      position: fixed; inset: 0;
-      background-image:
-        linear-gradient(rgba(200,245,66,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(200,245,66,0.03) 1px, transparent 1px);
-      background-size: 48px 48px;
-      pointer-events: none; z-index: 0;
-    }
+    .app { display: grid; grid-template-columns: 240px 1fr; grid-template-rows: auto 1fr; min-height: 100vh; position: relative; z-index: 1; }
 
-    .bg-glow {
-      position: fixed; top: -300px; left: 50%; transform: translateX(-50%);
-      width: 900px; height: 600px;
-      background: radial-gradient(ellipse, rgba(200,245,66,0.06) 0%, transparent 65%);
-      pointer-events: none; z-index: 0;
-    }
-
-    .app {
-      display: grid;
-      grid-template-columns: 240px 1fr;
-      grid-template-rows: auto 1fr;
-      min-height: 100vh;
-      position: relative; z-index: 1;
-    }
-
-    /* ── SIDEBAR ── */
-    .sidebar {
-      grid-row: 1 / -1;
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      display: flex; flex-direction: column;
-      padding: 32px 0;
-      position: sticky; top: 0; height: 100vh;
-      animation: slideInLeft 0.5s ease both;
-      z-index: 50;
-    }
-
-    @keyframes slideInLeft {
-      from { transform: translateX(-20px); opacity: 0; }
-      to   { transform: translateX(0);     opacity: 1; }
-    }
-
+    /* SIDEBAR */
+    .sidebar { grid-row: 1 / -1; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 32px 0; position: sticky; top: 0; height: 100vh; z-index: 50; }
     .logo { padding: 0 24px 32px; border-bottom: 1px solid var(--border); }
     .logo-text { font-family: var(--font-display); font-size: 36px; letter-spacing: 4px; color: var(--accent); line-height: 1; }
-    .logo-sub  { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
-
-    .nav { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+    .logo-sub { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
+    .nav { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
     .nav-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; padding: 0 8px; margin: 12px 0 6px; }
-
-    .nav-item {
-      display: flex; align-items: center; gap: 12px; padding: 10px 12px;
-      border-radius: 8px; cursor: pointer; color: var(--muted2); font-size: 14px;
-      font-weight: 500; transition: all 0.2s; text-decoration: none; border: 1px solid transparent;
-    }
-    .nav-item:hover  { color: var(--text); background: var(--card); }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; color: var(--muted2); font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; border: 1px solid transparent; }
+    .nav-item:hover { color: var(--text); background: var(--card); }
     .nav-item.active { color: var(--accent); background: rgba(200,245,66,0.08); border-color: rgba(200,245,66,0.15); }
-    .nav-item .icon  { width: 18px; text-align: center; font-size: 16px; }
+    .nav-item .icon { width: 18px; text-align: center; font-size: 16px; }
     .nav-item .badge { margin-left: auto; background: var(--accent3); color: #000; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; font-family: var(--font-mono); }
-
     .sidebar-bottom { padding: 16px; border-top: 1px solid var(--border); }
     .user-chip { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--card); border-radius: 10px; border: 1px solid var(--border); }
-    .avatar { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #000; flex-shrink: 0; }
+    .avatar { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #000; flex-shrink: 0; overflow: hidden; }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
     .user-info { flex: 1; min-width: 0; }
-    .user-name  { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .user-email { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .logout-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; transition: color 0.2s; }
     .logout-btn:hover { color: #fa6d6d; }
 
-    /* ── TOPBAR ── */
-    .topbar {
-      background: var(--surface); border-bottom: 1px solid var(--border);
-      padding: 0 32px; height: 64px;
-      display: flex; align-items: center; justify-content: space-between;
-      animation: fadeDown 0.5s ease both;
-    }
-    @keyframes fadeDown { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    /* TOPBAR */
+    .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
     .page-title { font-family: var(--font-display); font-size: 28px; letter-spacing: 2px; }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
     .topbar-right { display: flex; align-items: center; gap: 16px; }
     .status-dot { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted2); font-family: var(--font-mono); }
     .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); } }
 
-    /* ── HAMBURGER BUTTON ── */
-    .hamburger {
-      display: none;
-      flex-direction: column; justify-content: center; align-items: center;
-      gap: 5px; width: 40px; height: 40px;
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 8px; cursor: pointer; padding: 8px;
-      transition: border-color 0.2s;
-    }
+    /* HAMBURGER */
+    .hamburger { display: none; flex-direction: column; justify-content: center; align-items: center; gap: 5px; width: 40px; height: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: border-color 0.2s; }
     .hamburger:hover { border-color: rgba(200,245,66,0.3); }
-    .hamburger span {
-      display: block; width: 18px; height: 2px;
-      background: var(--text); border-radius: 2px;
-      transition: all 0.3s ease;
-    }
+    .hamburger span { display: block; width: 18px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.3s ease; }
     .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     .hamburger.open span:nth-child(2) { opacity: 0; }
     .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-    /* ── MOBILE OVERLAY ── */
-    .sidebar-overlay {
-      display: none;
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.7);
-      z-index: 49;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
+    /* SIDEBAR OVERLAY */
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 49; opacity: 0; transition: opacity 0.3s ease; }
     .sidebar-overlay.show { opacity: 1; }
 
-    /* ── MAIN ── */
+    /* MAIN */
     .main { padding: 32px; display: flex; flex-direction: column; gap: 24px; overflow-y: auto; }
 
+    /* STATS */
     .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-    .stat-card {
-      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
-      padding: 20px; position: relative; overflow: hidden;
-      animation: fadeUp 0.5s ease both; transition: border-color 0.2s, transform 0.2s;
-    }
+    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; position: relative; overflow: hidden; animation: fadeUp 0.5s ease both; transition: border-color 0.2s, transform 0.2s; }
     .stat-card:hover { border-color: rgba(200,245,66,0.2); transform: translateY(-2px); }
     .stat-card:nth-child(1) { animation-delay: 0.1s; }
     .stat-card:nth-child(2) { animation-delay: 0.2s; }
@@ -162,33 +80,36 @@
     .stat-card:nth-child(4) { animation-delay: 0.4s; }
     @keyframes fadeUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     .stat-card::before { content: ''; position: absolute; top: 0; right: 0; width: 60px; height: 60px; border-radius: 0 16px 0 60px; opacity: 0.12; }
-    .stat-card.green::before  { background: var(--accent); }
-    .stat-card.cyan::before   { background: var(--accent2); }
-    .stat-card.pink::before   { background: var(--accent3); }
+    .stat-card.green::before { background: var(--accent); }
+    .stat-card.cyan::before { background: var(--accent2); }
+    .stat-card.pink::before { background: var(--accent3); }
     .stat-card.orange::before { background: #f5a442; }
-    .stat-icon  { font-size: 22px; margin-bottom: 12px; }
+    .stat-icon { font-size: 22px; margin-bottom: 12px; }
     .stat-value { font-family: var(--font-display); font-size: 36px; letter-spacing: 1px; line-height: 1; margin-bottom: 4px; }
-    .stat-card.green .stat-value  { color: var(--accent); }
-    .stat-card.cyan .stat-value   { color: var(--accent2); }
-    .stat-card.pink .stat-value   { color: var(--accent3); }
+    .stat-card.green .stat-value { color: var(--accent); }
+    .stat-card.cyan .stat-value { color: var(--accent2); }
+    .stat-card.pink .stat-value { color: var(--accent3); }
     .stat-card.orange .stat-value { color: #f5a442; }
-    .stat-label  { font-size: 12px; color: var(--muted2); font-weight: 500; letter-spacing: 0.5px; }
+    .stat-label { font-size: 12px; color: var(--muted2); font-weight: 500; letter-spacing: 0.5px; }
     .stat-change { position: absolute; bottom: 16px; right: 16px; font-family: var(--font-mono); font-size: 11px; color: var(--accent); }
 
+    /* CARDS */
     .middle-grid { display: grid; grid-template-columns: 1fr 340px; gap: 16px; }
     .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; animation: fadeUp 0.5s ease both; animation-delay: 0.5s; }
     .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-    .card-title  { font-family: var(--font-display); font-size: 20px; letter-spacing: 1px; }
-    .card-badge  { font-family: var(--font-mono); font-size: 11px; color: var(--muted); background: var(--card2); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); }
+    .card-title { font-family: var(--font-display); font-size: 20px; letter-spacing: 1px; }
+    .card-badge { font-family: var(--font-mono); font-size: 11px; color: var(--muted); background: var(--card2); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); }
 
+    /* CHART */
     .chart { display: flex; align-items: flex-end; gap: 8px; height: 120px; }
     .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
     .bar { width: 100%; border-radius: 6px 6px 0 0; background: rgba(200,245,66,0.15); border: 1px solid rgba(200,245,66,0.2); transition: background 0.2s; cursor: pointer; animation: growBar 0.8s ease both; }
-    .bar:hover    { background: rgba(200,245,66,0.35); }
+    .bar:hover { background: rgba(200,245,66,0.35); }
     .bar.highlight { background: var(--accent); border-color: var(--accent); }
     @keyframes growBar { from { transform: scaleY(0); transform-origin: bottom; } to { transform: scaleY(1); transform-origin: bottom; } }
     .bar-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
 
+    /* WALLET */
     .wallet-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; animation: fadeUp 0.5s ease both; animation-delay: 0.6s; }
     .wallet-display { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 16px 0; display: flex; align-items: center; gap: 10px; }
     .wallet-icon { font-size: 20px; }
@@ -197,16 +118,18 @@
     .copy-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; transition: color 0.2s; }
     .copy-btn:hover { color: var(--accent); }
     .wallet-input-wrap { display: flex; gap: 8px; margin-top: 12px; }
-    .wallet-input { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); font-family: var(--font-mono); font-size: 12px; outline: none; transition: border-color 0.2s; }
+    .wallet-input { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); font-family: var(--font-mono); font-size: 12px; outline: none; transition: border-color 0.2s; min-width: 0; }
     .wallet-input:focus { border-color: var(--accent2); }
     .wallet-input::placeholder { color: var(--muted); }
 
-    .btn { padding: 10px 18px; border-radius: 8px; border: none; cursor: pointer; font-family: var(--font-body); font-weight: 600; font-size: 13px; transition: all 0.2s; }
-    .btn-accent  { background: var(--accent); color: #000; }
-    .btn-accent:hover  { background: #d4ff44; transform: translateY(-1px); }
+    /* BUTTONS */
+    .btn { padding: 10px 18px; border-radius: 8px; border: none; cursor: pointer; font-family: var(--font-body); font-weight: 600; font-size: 13px; transition: all 0.2s; white-space: nowrap; }
+    .btn-accent { background: var(--accent); color: #000; }
+    .btn-accent:hover { background: #d4ff44; transform: translateY(-1px); }
     .btn-accent2 { background: rgba(66,245,200,0.12); color: var(--accent2); border: 1px solid rgba(66,245,200,0.25); }
     .btn-accent2:hover { background: rgba(66,245,200,0.2); }
 
+    /* TASKS */
     .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .task-list { display: flex; flex-direction: column; gap: 10px; }
     .task-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--card2); border-radius: 10px; border: 1px solid var(--border); transition: border-color 0.2s; cursor: pointer; }
@@ -215,21 +138,31 @@
     .task-check { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--muted); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; transition: all 0.2s; }
     .task-item.done .task-check { background: var(--accent); border-color: var(--accent); color: #000; }
     .task-text { flex: 1; font-size: 13px; font-weight: 500; }
-    .task-pts  { font-family: var(--font-mono); font-size: 12px; color: var(--accent); font-weight: 500; }
+    .task-pts { font-family: var(--font-mono); font-size: 12px; color: var(--accent); font-weight: 500; }
 
+    /* LEADERBOARD */
     .lb-list { display: flex; flex-direction: column; gap: 8px; }
     .lb-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--card2); border-radius: 10px; border: 1px solid var(--border); transition: border-color 0.2s; }
     .lb-item:hover { border-color: rgba(200,245,66,0.15); }
-    .lb-item.you   { border-color: rgba(200,245,66,0.3); background: rgba(200,245,66,0.05); }
+    .lb-item.you { border-color: rgba(200,245,66,0.3); background: rgba(200,245,66,0.05); }
     .lb-rank { font-family: var(--font-display); font-size: 20px; width: 28px; text-align: center; color: var(--muted); }
     .lb-item:nth-child(1) .lb-rank { color: #ffd700; }
     .lb-item:nth-child(2) .lb-rank { color: #c0c0c0; }
     .lb-item:nth-child(3) .lb-rank { color: #cd7f32; }
     .lb-avatar { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #000; flex-shrink: 0; }
-    .lb-name    { flex: 1; font-size: 13px; font-weight: 500; }
+    .lb-name { flex: 1; font-size: 13px; font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .lb-you-tag { font-family: var(--font-mono); font-size: 10px; color: var(--accent); background: rgba(200,245,66,0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(200,245,66,0.2); }
-    .lb-pts     { font-family: var(--font-mono); font-size: 13px; color: var(--text); font-weight: 500; }
+    .lb-pts { font-family: var(--font-mono); font-size: 13px; color: var(--text); font-weight: 500; }
 
+    /* REFERRAL */
+    .ref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .ref-box { background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    .ref-box-label { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .ref-code { font-family: var(--font-display); font-size: 32px; color: var(--accent); letter-spacing: 4px; }
+    .ref-pts { font-family: var(--font-display); font-size: 32px; color: var(--accent2); }
+    .ref-link-row { display: flex; gap: 8px; }
+
+    /* LOADING */
     .loading-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; transition: opacity 0.5s, visibility 0.5s; }
     .loading-overlay.hidden { opacity: 0; visibility: hidden; }
     .loading-logo { font-family: var(--font-display); font-size: 64px; letter-spacing: 8px; color: var(--accent); animation: flicker 1.5s ease infinite; }
@@ -238,41 +171,59 @@
     .loading-bar { height: 100%; background: var(--accent); border-radius: 2px; animation: loadBar 1.5s ease forwards; }
     @keyframes loadBar { from { width: 0; } to { width: 100%; } }
 
-    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 14px; z-index: 200; transform: translateY(80px); opacity: 0; transition: all 0.3s ease; }
-    .toast.show    { transform: translateY(0); opacity: 1; }
+    /* TOAST */
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 14px; z-index: 200; transform: translateY(80px); opacity: 0; transition: all 0.3s ease; max-width: calc(100vw - 32px); }
+    .toast.show { transform: translateY(0); opacity: 1; }
     .toast.success { border-color: rgba(200,245,66,0.3); }
-    .toast.error   { border-color: rgba(250,109,109,0.3); }
+    .toast.error { border-color: rgba(250,109,109,0.3); }
 
-    /* ── RESPONSIVE ── */
+    /* ===== RESPONSIVE ===== */
     @media (max-width: 1100px) {
-      .stats-grid  { grid-template-columns: repeat(2, 1fr); }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
       .middle-grid { grid-template-columns: 1fr; }
       .bottom-grid { grid-template-columns: 1fr; }
     }
-@media (max-width: 768px) {
-  .app { grid-template-columns: 1fr; }
 
-  /* Sidebar slides in from left on mobile */
-  .sidebar {
-    display: flex;
-    position: fixed;
-    left: 0; top: 0;
-    height: 100vh;
-    width: 260px;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    z-index: 50;
-  }
-  .sidebar.open { transform: translateX(0); }
+    @media (max-width: 768px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar {
+        display: flex; position: fixed;
+        left: 0; top: 0; height: 100vh; width: 260px;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 50;
+      }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-overlay { display: block; }
+      .hamburger { display: flex; }
+      .topbar { padding: 0 16px; height: 56px; }
+      .main { padding: 16px; gap: 16px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .stat-value { font-size: 28px; }
+      .stat-card { padding: 14px; }
+      .middle-grid { grid-template-columns: 1fr; }
+      .bottom-grid { grid-template-columns: 1fr; }
+      .ref-grid { grid-template-columns: 1fr 1fr; }
+      .ref-code { font-size: 22px; letter-spacing: 2px; }
+      .ref-pts { font-size: 22px; }
+      .wallet-input-wrap { flex-wrap: wrap; }
+      .wallet-input-wrap .btn { flex: 1; }
+      .ref-link-row { flex-direction: column; }
+      .ref-link-row .btn { width: 100%; }
+      .toast { right: 12px; left: 12px; }
+    }
 
-  .sidebar-overlay { display: block; }
-
-  .hamburger { display: flex; }
-
-  .topbar { padding: 0 16px; }
-  .main   { padding: 16px; }
-}
-    
+    @media (max-width: 480px) {
+      .stats-grid { gap: 8px; }
+      .stat-value { font-size: 24px; }
+      .stat-label { font-size: 10px; }
+      .stat-change { font-size: 10px; }
+      .page-title { font-size: 20px; }
+      .card { padding: 16px; }
+      .card-title { font-size: 16px; }
+      .ref-grid { grid-template-columns: 1fr; }
+      .ref-code { font-size: 28px; }
+    }
   </style>
 </head>
 <body>
@@ -285,8 +236,6 @@
 <div class="bg-grid"></div>
 <div class="bg-glow"></div>
 <div class="toast" id="toast"></div>
-
-<!-- Mobile overlay (closes sidebar when tapped) -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
 <div class="app">
@@ -297,15 +246,15 @@
     </div>
     <nav class="nav">
       <div class="nav-label">Main</div>
-      <a class="nav-item active" href="dashboard.html"><span class="icon">⚡</span> Dashboard</a>
-      <a class="nav-item" href="leaderboard.html"><span class="icon">🏆</span> Leaderboard <span class="badge">LIVE</span></a>
-      <a class="nav-item" href="dashboard.html#wallet"><span class="icon">💼</span> Wallet</a>
+      <a class="nav-item active" href="dashboard.html" onclick="closeSidebar()"><span class="icon">⚡</span> Dashboard</a>
+      <a class="nav-item" href="leaderboard.html" onclick="closeSidebar()"><span class="icon">🏆</span> Leaderboard <span class="badge">LIVE</span></a>
+      <a class="nav-item" href="dashboard.html#wallet" onclick="closeSidebar()"><span class="icon">💼</span> Wallet</a>
       <div class="nav-label">Activity</div>
-      <a class="nav-item" href="tasks.html"><span class="icon">✅</span> Tasks</a>
-      <a class="nav-item" href="points-history.html"><span class="icon">📈</span> Points History</a>
+      <a class="nav-item" href="tasks.html" onclick="closeSidebar()"><span class="icon">✅</span> Tasks</a>
+      <a class="nav-item" href="points-history.html" onclick="closeSidebar()"><span class="icon">📈</span> Points History</a>
       <div class="nav-label">Account</div>
-      <a class="nav-item" href="profile.html"><span class="icon">👤</span> Profile</a>
-      <a class="nav-item" href="settings.html"><span class="icon">⚙️</span> Settings</a>
+      <a class="nav-item" href="profile.html" onclick="closeSidebar()"><span class="icon">👤</span> Profile</a>
+      <a class="nav-item" href="settings.html" onclick="closeSidebar()"><span class="icon">⚙️</span> Settings</a>
     </nav>
     <div class="sidebar-bottom">
       <div class="user-chip">
@@ -320,8 +269,7 @@
   </aside>
 
   <header class="topbar">
-    <div style="display:flex;align-items:center;gap:12px;">
-      <!-- Hamburger button (mobile only) -->
+    <div class="topbar-left">
       <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
         <span></span><span></span><span></span>
       </button>
@@ -403,17 +351,17 @@
           <div class="card-title">🔗 REFERRALS</div>
           <div class="card-badge" id="refCount">0 referrals</div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-          <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:20px;">
-            <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Your Code</div>
-            <div style="font-family:var(--font-display);font-size:32px;color:var(--accent);letter-spacing:4px;" id="refCode">—</div>
+        <div class="ref-grid">
+          <div class="ref-box">
+            <div class="ref-box-label">Your Code</div>
+            <div class="ref-code" id="refCode">—</div>
           </div>
-          <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:20px;">
-            <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Points Earned</div>
-            <div style="font-family:var(--font-display);font-size:32px;color:var(--accent2);" id="refPts">0</div>
+          <div class="ref-box">
+            <div class="ref-box-label">Points Earned</div>
+            <div class="ref-pts" id="refPts">0</div>
           </div>
         </div>
-        <div style="display:flex;gap:8px;">
+        <div class="ref-link-row">
           <input class="wallet-input" id="refLink" readonly style="flex:1;font-size:11px;" placeholder="Loading referral link...">
           <button class="btn btn-accent2" onclick="copyRefLink()">Copy Link</button>
         </div>
@@ -431,37 +379,16 @@
 </div>
 
 <script>
-  // ── Hamburger menu ──
   function toggleSidebar() {
-    const sidebar  = document.getElementById("sidebar");
-    const overlay  = document.getElementById("sidebarOverlay");
-    const hamburger = document.getElementById("hamburger");
-    sidebar.classList.toggle("open");
-    overlay.classList.toggle("show");
-    hamburger.classList.toggle("open");
+    document.getElementById("sidebar").classList.toggle("open");
+    document.getElementById("sidebarOverlay").classList.toggle("show");
+    document.getElementById("hamburger").classList.toggle("open");
   }
-
   function closeSidebar() {
     document.getElementById("sidebar").classList.remove("open");
     document.getElementById("sidebarOverlay").classList.remove("show");
     document.getElementById("hamburger").classList.remove("open");
   }
-
-  // Close sidebar when a nav link is tapped on mobile
-  document.querySelectorAll(".nav-item").forEach(item => {
-    item.addEventListener("click", () => {
-      if (window.innerWidth <= 768) closeSidebar();
-    });
-  });
-
-  // ── App logic ──
-  window.addEventListener("DOMContentLoaded", () => {
-    const params = new URLSearchParams(window.location.search);
-    const ref = params.get("ref");
-    if (ref && document.getElementById("referralCode")) {
-      document.getElementById("referralCode").value = ref;
-    }
-  });
 
   const API   = "https://zestful-wisdom-production-c5b7.up.railway.app/api";
   const token = localStorage.getItem("token");
@@ -477,7 +404,6 @@
   window.onload = async () => {
     setTimeout(() => document.getElementById("loader").classList.add("hidden"), 1500);
     if (!token) { window.location.href = "login.html"; return; }
-
     try {
       const pRes = await fetch(`${API}/protected/profile`, { headers: { "Authorization": "Bearer " + token } });
       if (!pRes.ok) { logout(); return; }
@@ -521,7 +447,7 @@
     const el = document.getElementById(id);
     const start = performance.now();
     const update = (now) => {
-      const p    = Math.min((now - start) / duration, 1);
+      const p = Math.min((now - start) / duration, 1);
       const ease = 1 - Math.pow(1 - p, 3);
       el.textContent = Math.floor(from + (to - from) * ease).toLocaleString();
       if (p < 1) requestAnimationFrame(update);
@@ -530,15 +456,15 @@
   }
 
   function renderChart(weekly) {
-    const DAYS   = ["M","T","W","T","F","S","S"];
+    const DAYS = ["M","T","W","T","F","S","S"];
     const values = weekly.map(d => d.points);
-    const max    = Math.max(...values) || 1;
-    const chart  = document.getElementById("chart");
+    const max = Math.max(...values) || 1;
+    const chart = document.getElementById("chart");
     chart.innerHTML = "";
     weekly.forEach((day, i) => {
-      const date     = new Date(day.date + "T00:00:00");
+      const date = new Date(day.date + "T00:00:00");
       const dayLabel = DAYS[date.getDay() === 0 ? 6 : date.getDay() - 1];
-      const wrap     = document.createElement("div");
+      const wrap = document.createElement("div");
       wrap.className = "bar-wrap";
       wrap.innerHTML = `
         <div class="bar ${day.points === max && max > 0 ? "highlight" : ""}"
@@ -571,7 +497,7 @@
 
   async function completeTask(taskKey, pts) {
     try {
-      const res  = await fetch(`${API}/protected/task`, {
+      const res = await fetch(`${API}/protected/task`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
         body: JSON.stringify({ taskKey })
@@ -590,7 +516,7 @@
     list.innerHTML = "";
     leaderboard.forEach((u, i) => {
       const isYou = u.username === currentUsername;
-      const item  = document.createElement("div");
+      const item = document.createElement("div");
       item.className = "lb-item" + (isYou ? " you" : "");
       item.innerHTML = `
         <div class="lb-rank">${i + 1}</div>
@@ -614,7 +540,7 @@
     const addr = document.getElementById("walletInput").value.trim();
     if (!addr) { showToast("⚠️ Enter a wallet address", "error"); return; }
     try {
-      const res  = await fetch(`${API}/protected/wallet`, {
+      const res = await fetch(`${API}/protected/wallet`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
         body: JSON.stringify({ wallet: addr })
@@ -638,6 +564,12 @@
     showToast("📋 Address copied!", "success");
   }
 
+  function copyRefLink() {
+    const link = document.getElementById("refLink").value;
+    navigator.clipboard.writeText(link);
+    showToast("🔗 Referral link copied!", "success");
+  }
+
   function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -649,12 +581,6 @@
     t.textContent = msg;
     t.className = `toast ${type} show`;
     setTimeout(() => t.classList.remove("show"), 2500);
-  }
-
-  function copyRefLink() {
-    const link = document.getElementById("refLink").value;
-    navigator.clipboard.writeText(link);
-    showToast("🔗 Referral link copied!", "success");
   }
 </script>
 </body>
