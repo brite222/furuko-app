@@ -1,4 +1,4 @@
-const BASE_URL = "http://127.0.0.1:5000/api/auth";
+const BASE_URL = "https://zestful-wisdom-production-c5b7.up.railway.app/api/auth";
 
 function showAlert(message, type) {
   const alertBox = document.getElementById("alert");
