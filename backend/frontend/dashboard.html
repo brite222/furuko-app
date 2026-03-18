@@ -184,51 +184,50 @@
       .bottom-grid { grid-template-columns: 1fr; }
     }
 
-    @media (max-width: 768px) {
-      .app { grid-template-columns: 1fr; }
-      .sidebar {
-        display: flex; position: fixed;
-        left: 0; top: 0; height: 100vh; width: 260px;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-        z-index: 50;
-      }
-      .sidebar.open { transform: translateX(0); }
-      .sidebar-overlay { display: block; }
-      .hamburger { display: flex; }
-      .topbar { padding: 0 16px; height: 56px; }
-      /* ✅ KEY FIX: safe-area padding for mobile browsers */
-      .main {
-        padding: 16px;
-        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 80px);
-        gap: 16px;
-      }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .stat-value { font-size: 28px; }
-      .stat-card { padding: 14px; }
-      .middle-grid { grid-template-columns: 1fr; }
-      .bottom-grid { grid-template-columns: 1fr; }
-      .ref-grid { grid-template-columns: 1fr 1fr; }
-      .ref-code { font-size: 22px; letter-spacing: 2px; }
-      .ref-pts { font-size: 22px; }
-      .wallet-input-wrap { flex-wrap: wrap; }
-      .wallet-input-wrap .btn { flex: 1; }
-      .ref-link-row { flex-direction: column; }
-      .ref-link-row .btn { width: 100%; }
-      .toast { right: 12px; left: 12px; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); }
-    }
+   @media (max-width: 768px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar {
+    display: flex; position: fixed;
+    left: 0; top: 0; height: 100vh; width: 260px;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 50;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-overlay { display: block; }
+  .hamburger { display: flex; }
+  .topbar { padding: 0 16px; height: 56px; }
+  .main {
+    padding: 16px;
+    padding-bottom: 160px; /* ✅ increased to clear browser bottom bar */
+    gap: 16px;
+  }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stat-value { font-size: 28px; }
+  .stat-card { padding: 14px; }
+  .middle-grid { grid-template-columns: 1fr; }
+  .bottom-grid { grid-template-columns: 1fr; }
+  .ref-grid { grid-template-columns: 1fr 1fr; }
+  .ref-code { font-size: 22px; letter-spacing: 2px; }
+  .ref-pts { font-size: 22px; }
+  .wallet-input-wrap { flex-wrap: wrap; }
+  .wallet-input-wrap .btn { flex: 1; }
+  .ref-link-row { flex-direction: column; }
+  .ref-link-row .btn { width: 100%; }
+  .toast { right: 12px; left: 12px; bottom: 80px; }
+}
 
-    @media (max-width: 480px) {
-      .stats-grid { gap: 8px; }
-      .stat-value { font-size: 24px; }
-      .stat-label { font-size: 10px; }
-      .stat-change { font-size: 10px; }
-      .page-title { font-size: 20px; }
-      .card { padding: 16px; }
-      .card-title { font-size: 16px; }
-      .ref-grid { grid-template-columns: 1fr; }
-      .ref-code { font-size: 28px; }
-    }
+@media (max-width: 480px) {
+  .stats-grid { gap: 8px; }
+  .stat-value { font-size: 24px; }
+  .stat-label { font-size: 10px; }
+  .stat-change { font-size: 10px; }
+  .page-title { font-size: 20px; }
+  .card { padding: 16px; }
+  .card-title { font-size: 16px; }
+  .ref-grid { grid-template-columns: 1fr; }
+  .ref-code { font-size: 28px; }
+}
   </style>
 </head>
 <body>
