@@ -11,7 +11,10 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, '../frontend')));  // ← ADD THIS
+
+// REPLACE the existing static line with these two:
+console.log("Static path:", path.join(__dirname, '../frontend'));
+app.use(express.static(path.join(__dirname, '../frontend')));
 
 const authRoutes = require("./routes/authRoutes");
 const protectedRoutes = require("./routes/protectedRoutes");
