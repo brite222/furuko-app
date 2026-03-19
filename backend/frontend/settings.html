@@ -20,7 +20,7 @@
     .bg-glow { position: fixed; top: -300px; left: 50%; transform: translateX(-50%); width: 900px; height: 600px; background: radial-gradient(ellipse, rgba(200,245,66,0.06) 0%, transparent 65%); pointer-events: none; z-index: 0; }
 
     /* .app — NO z-index, NO position:relative */
-    .app { display: grid; grid-template-columns: 1fr; min-height: 100vh; }
+    .app { display: flex; flex-direction: column;  min-height: 100vh; }
 
     /* SIDEBAR — always fixed, direct body child */
     .sidebar {
@@ -163,10 +163,10 @@
 
 <!-- Sidebar outside .app -->
 <aside class="sidebar" id="sidebar">
- <div class="logo">
-  <img src="logo.jpg" alt="FUKURO" style="width:100%;max-width:160px;border-radius:12px;display:block;" />
-  <div class="logo-sub" style="margin-top:8px;">Ecosystem Dashboard</div>
-</div>
+  <div class="logo">
+    <div class="logo-text">FUKURO</div>
+    <div class="logo-sub">Ecosystem Dashboard</div>
+  </div>
   <nav class="nav">
     <div class="nav-label">Main</div>
     <a class="nav-item" href="dashboard.html"><span class="icon">⚡</span> Dashboard</a>

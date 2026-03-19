@@ -19,15 +19,41 @@
     body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; overflow-x: hidden; }
     .bg-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(200,245,66,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(200,245,66,0.03) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; z-index: 0; }
     .bg-glow { position: fixed; top: -300px; left: 50%; transform: translateX(-50%); width: 900px; height: 600px; background: radial-gradient(ellipse, rgba(200,245,66,0.05) 0%, transparent 65%); pointer-events: none; z-index: 0; }
-    .app { display: grid; grid-template-columns: 240px 1fr; grid-template-rows: auto 1fr; min-height: 100vh; position: relative; z-index: 1; }
-    .sidebar { grid-row: 1 / -1; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 32px 0; position: sticky; top: 0; height: 100vh; animation: slideInLeft 0.5s ease both; }
-    @keyframes slideInLeft { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    /* .app — NO z-index, NO position:relative, NO grid sidebar column */
+    .app { display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* SIDEBAR — always fixed, always a direct body child, never inside .app */
+    .sidebar {
+      position: fixed !important;
+      top: 0; left: 0;
+      width: 240px;
+      height: 100%; height: 100dvh;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex !important;
+      flex-direction: column;
+      padding: 32px 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      z-index: 200 !important;
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    .sidebar.open { transform: translateX(0) !important; box-shadow: 8px 0 32px rgba(0,0,0,0.6); }
+
+    /* Desktop: sidebar always visible, .app gets left margin */
+    @media (min-width: 769px) {
+      .sidebar { transform: translateX(0) !important; box-shadow: none !important; }
+      .app { margin-left: 240px; }
+    }
+
     .logo { padding: 0 24px 32px; border-bottom: 1px solid var(--border); }
-    .logo-text { font-family: var(--font-display); font-size: 36px; letter-spacing: 4px; color: var(--accent); line-height: 1; }
     .logo-sub { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
     .nav { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
     .nav-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; padding: 0 8px; margin: 12px 0 6px; }
-    .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; color: var(--muted2); font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; border: 1px solid transparent; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; color: var(--muted2); font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; border: 1px solid transparent; -webkit-tap-highlight-color: transparent; }
     .nav-item:hover { color: var(--text); background: var(--card); }
     .nav-item.active { color: var(--accent); background: rgba(200,245,66,0.08); border-color: rgba(200,245,66,0.15); }
     .nav-item .icon { width: 18px; text-align: center; font-size: 16px; }
@@ -38,14 +64,28 @@
     .user-info { flex: 1; min-width: 0; }
     .user-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .user-email { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .logout-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; transition: color 0.2s; }
+    .logout-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; transition: color 0.2s; -webkit-tap-highlight-color: transparent; }
     .logout-btn:hover { color: #fa6d6d; }
-    .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; height: 64px; display: flex; align-items: center; justify-content: space-between; animation: fadeDown 0.5s ease both; }
-    @keyframes fadeDown { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* TOPBAR — z-index 150: above overlay(100), below sidebar(200) */
+    .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 150; }
     .page-title { font-family: var(--font-display); font-size: 28px; letter-spacing: 2px; }
     .status-dot { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted2); font-family: var(--font-mono); }
     .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+    /* HAMBURGER */
+    .hamburger { display: none; flex-direction: column; justify-content: center; align-items: center; gap: 5px; width: 44px; height: 44px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: border-color 0.2s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    .hamburger:hover { border-color: rgba(200,245,66,0.3); }
+    .hamburger span { display: block; width: 18px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.3s ease; pointer-events: none; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* OVERLAY — z-index 100, below sidebar(200) */
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+    .sidebar-overlay.show { opacity: 1; pointer-events: auto; }
+
     .main { padding: 32px; display: flex; flex-direction: column; gap: 24px; overflow-y: auto; }
     @keyframes fadeUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; animation: fadeUp 0.5s ease both; }
@@ -81,78 +121,51 @@
 
     /* TASK CARDS */
     .tasks-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-
     .task-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px; transition: border-color 0.2s, transform 0.2s; animation: fadeUp 0.5s ease both; position: relative; overflow: hidden; }
     .task-card:hover { border-color: rgba(200,245,66,0.15); transform: translateY(-2px); }
     .task-card.completed { opacity: 0.7; }
     .task-card.completed::after { content: ''; position: absolute; inset: 0; background: rgba(200,245,66,0.02); pointer-events: none; }
-
     .task-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
     .task-card-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
     .task-card-icon.done { background: rgba(200,245,66,0.1); border: 1px solid rgba(200,245,66,0.2); }
     .task-card-icon.pending { background: var(--card2); border: 1px solid var(--border); }
-
     .task-card-info { flex: 1; }
     .task-card-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
     .task-card-desc { font-size: 12px; color: var(--muted2); line-height: 1.5; }
-
     .task-pts-badge { font-family: var(--font-display); font-size: 22px; color: var(--accent); letter-spacing: 1px; white-space: nowrap; }
-
     .task-card-bottom { display: flex; align-items: center; justify-content: space-between; }
-
     .task-status { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; }
     .task-status.done { color: var(--accent); }
     .task-status.pending { color: var(--muted2); }
     .task-status-dot { width: 8px; height: 8px; border-radius: 50%; }
     .task-status.done .task-status-dot { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
     .task-status.pending .task-status-dot { background: var(--muted); }
-
-    .btn-complete { padding: 8px 16px; background: var(--accent); color: #000; border: none; border-radius: 8px; font-family: var(--font-body); font-weight: 700; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+    .btn-complete { padding: 8px 16px; background: var(--accent); color: #000; border: none; border-radius: 8px; font-family: var(--font-body); font-weight: 700; font-size: 12px; cursor: pointer; transition: all 0.2s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     .btn-complete:hover { background: #d4ff44; transform: translateY(-1px); }
     .btn-complete:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
     .btn-done { padding: 8px 16px; background: rgba(200,245,66,0.08); color: var(--accent); border: 1px solid rgba(200,245,66,0.2); border-radius: 8px; font-family: var(--font-body); font-weight: 600; font-size: 12px; cursor: default; }
 
-    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 14px; z-index: 200; transform: translateY(80px); opacity: 0; transition: all 0.3s ease; }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 14px; z-index: 9999; transform: translateY(80px); opacity: 0; transition: all 0.3s ease; pointer-events: none; }
     .toast.show { transform: translateY(0); opacity: 1; }
     .toast.success { border-color: rgba(200,245,66,0.3); }
     .toast.error { border-color: rgba(250,109,109,0.3); }
 
-    .loading-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; transition: opacity 0.5s, visibility 0.5s; }
+    .loading-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999; transition: opacity 0.5s, visibility 0.5s; }
     .loading-overlay.hidden { opacity: 0; visibility: hidden; }
     .loading-logo { font-family: var(--font-display); font-size: 64px; letter-spacing: 8px; color: var(--accent); animation: flicker 1.5s ease infinite; }
     @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
     .loading-bar-wrap { width: 200px; height: 2px; background: var(--border); border-radius: 2px; margin-top: 24px; overflow: hidden; }
     .loading-bar { height: 100%; background: var(--accent); border-radius: 2px; animation: loadBar 1.5s ease forwards; }
     @keyframes loadBar { from { width: 0; } to { width: 100%; } }
-.hamburger {
-  display: none;
-  flex-direction: column; justify-content: center; align-items: center;
-  gap: 5px; width: 40px; height: 40px;
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 8px; cursor: pointer;
-  transition: border-color 0.2s;
-}
-.hamburger:hover { border-color: rgba(200,245,66,0.3); }
-.hamburger span { display: block; width: 18px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.3s ease; }
-.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.hamburger.open span:nth-child(2) { opacity: 0; }
-.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 49; opacity: 0; transition: opacity 0.3s ease; }
-.sidebar-overlay.show { opacity: 1; }
 
-@media (max-width: 768px) {
-  .app { grid-template-columns: 1fr; }
-  .sidebar { display: flex; position: fixed; left: 0; top: 0; height: 100vh; width: 260px; transform: translateX(-100%); transition: transform 0.3s ease; z-index: 50; }
-  .sidebar.open { transform: translateX(0); }
-  .sidebar-overlay { display: block; }
-  .hamburger { display: flex; }
-  .topbar { padding: 0 16px; }
-  .main { padding: 16px; }
-  .summary-grid { grid-template-columns: 1fr; }
-  .tasks-grid { grid-template-columns: 1fr; }
-}
-    
+    @media (max-width: 768px) {
+      .sidebar-overlay { display: block; }
+      .hamburger { display: flex; }
+      .topbar { padding: 0 16px; height: 56px; }
+      .main { padding: 16px; }
+      .summary-grid { grid-template-columns: 1fr; }
+      .tasks-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -165,51 +178,52 @@
 <div class="bg-grid"></div>
 <div class="bg-glow"></div>
 <div class="toast" id="toast"></div>
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<!-- Overlay sits at z-index 100, below sidebar (200) -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- Sidebar is OUTSIDE .app — no stacking context trap -->
+<aside class="sidebar" id="sidebar">
+  <div class="logo">
+    <img src="logo.jpg" alt="FUKURO" style="width:100%;max-width:160px;border-radius:12px;display:block;" />
+    <div class="logo-sub" style="margin-top:8px;">Ecosystem Dashboard</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-label">Main</div>
+    <a class="nav-item" href="dashboard.html"><span class="icon">⚡</span> Dashboard</a>
+    <a class="nav-item" href="leaderboard.html"><span class="icon">🏆</span> Leaderboard <span class="badge">LIVE</span></a>
+    <a class="nav-item" href="dashboard.html#wallet"><span class="icon">💼</span> Wallet</a>
+    <div class="nav-label">Activity</div>
+    <a class="nav-item active" href="tasks.html"><span class="icon">✅</span> Tasks</a>
+    <a class="nav-item" href="points-history.html"><span class="icon">📈</span> Points History</a>
+    <div class="nav-label">Account</div>
+    <a class="nav-item" href="profile.html"><span class="icon">👤</span> Profile</a>
+    <a class="nav-item" href="settings.html"><span class="icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="user-chip">
+      <div class="avatar" id="sidebarAvatar">?</div>
+      <div class="user-info">
+        <div class="user-name" id="sidebarName">Loading...</div>
+        <div class="user-email" id="sidebarEmail">—</div>
+      </div>
+      <button class="logout-btn" id="logoutBtn" title="Logout">⏻</button>
+    </div>
+  </div>
+</aside>
 
 <div class="app">
-  <aside class="sidebar">
-   <div class="logo">
-  <img src="logo.jpg" alt="FUKURO" style="width:100%;max-width:160px;border-radius:12px;display:block;" />
-  <div class="logo-sub" style="margin-top:8px;">Ecosystem Dashboard</div>
-</div>
-    <nav class="nav">
-      <div class="nav-label">Main</div>
-      <a class="nav-item" href="dashboard.html"><span class="icon">⚡</span> Dashboard</a>
-      <a class="nav-item" href="leaderboard.html"><span class="icon">🏆</span> Leaderboard <span class="badge">LIVE</span></a>
-      <a class="nav-item" href="dashboard.html#wallet"><span class="icon">💼</span> Wallet</a>
-      <div class="nav-label">Activity</div>
-      <a class="nav-item active" href="tasks.html"><span class="icon">✅</span> Tasks</a>
-      <a class="nav-item" href="points-history.html"><span class="icon">📈</span> Points History</a>
-      <div class="nav-label">Account</div>
-      <a class="nav-item" href="profile.html"><span class="icon">👤</span> Profile</a>
-      <a class="nav-item" href="settings.html"><span class="icon">⚙️</span> Settings</a>
-    </nav>
-    <div class="sidebar-bottom">
-      <div class="user-chip">
-        <div class="avatar" id="sidebarAvatar">?</div>
-        <div class="user-info">
-          <div class="user-name" id="sidebarName">Loading...</div>
-          <div class="user-email" id="sidebarEmail">—</div>
-        </div>
-        <button class="logout-btn" onclick="logout()" title="Logout">⏻</button>
-      </div>
-    </div>
-  </aside>
-
   <header class="topbar">
-  <div style="display:flex;align-items:center;gap:12px;">
-    <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
-      <span></span><span></span><span></span>
-    </button>
-    <div class="page-title">DAILY TASKS</div>
-  </div>
-  <div class="status-dot"><div class="dot"></div><span>LIVE</span></div>
-</header>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="hamburger" id="hamburger" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="page-title">DAILY TASKS</div>
+    </div>
+    <div class="status-dot"><div class="dot"></div><span>LIVE</span></div>
+  </header>
 
   <main class="main">
 
-    <!-- SUMMARY -->
     <div class="summary-grid">
       <div class="summary-card green">
         <div class="summary-icon">✅</div>
@@ -228,7 +242,6 @@
       </div>
     </div>
 
-    <!-- PROGRESS -->
     <div class="card" style="animation-delay:0.4s">
       <div class="card-header">
         <div class="card-title">TODAY'S PROGRESS</div>
@@ -245,7 +258,6 @@
       </div>
     </div>
 
-    <!-- TASKS GRID -->
     <div class="tasks-grid" id="tasksGrid"></div>
 
   </main>
@@ -255,43 +267,53 @@
   const API = "https://zestful-wisdom-production-c5b7.up.railway.app/api";
   const token = localStorage.getItem("token");
 
-  const TASKS_CONFIG = [
-    {
-      key: "loginToday",
-      icon: "🔐",
-      title: "Login Today",
-      desc: "Log into your FUKURO account today to keep your streak alive and earn daily points.",
-      pts: 10,
-      autoComplete: true
-    },
-    {
-      key: "connectWallet",
-      icon: "💼",
-      title: "Connect Wallet",
-      desc: "Link your wallet address to your account for identification and future rewards.",
-      pts: 50
-    },
-    {
-      key: "completeProfile",
-      icon: "👤",
-      title: "Complete Profile",
-      desc: "Fill in your profile information to unlock the complete profile bonus points.",
-      pts: 30
-    },
-    {
-      key: "referFriend",
-      icon: "🔗",
-      title: "Refer a Friend",
-      desc: "Share your referral code with a friend. Earn 100 points when they join FUKURO.",
-      pts: 100
-    },
-    {
-      key: "earn500Points",
-      icon: "🏆",
-      title: "Earn 500 Points",
-      desc: "Accumulate a total of 500 points across all your activities on the platform.",
-      pts: 20
+  // ── Sidebar ──────────────────────────────────────────────────
+  (function() {
+    var s  = document.getElementById('sidebar');
+    var o  = document.getElementById('sidebarOverlay');
+    var h  = document.getElementById('hamburger');
+    var lb = document.getElementById('logoutBtn');
+
+    function open() {
+      s.classList.add('open');
+      o.classList.add('show');
+      h.classList.add('open');
+      document.body.style.overflow = 'hidden';
     }
+    function close() {
+      s.classList.remove('open');
+      o.classList.remove('show');
+      h.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    window.toggleSidebar = function() { s.classList.contains('open') ? close() : open(); };
+    window.closeSidebar  = close;
+
+    h.addEventListener('click', function(e) { e.stopPropagation(); window.toggleSidebar(); });
+    o.addEventListener('click', close);
+    lb.addEventListener('click', function() { logout(); });
+
+    document.querySelectorAll('.nav-item').forEach(function(a) {
+      a.addEventListener('click', function() { if (window.innerWidth <= 768) close(); });
+    });
+
+    // Swipe left to close
+    var tx = 0, ty = 0;
+    s.addEventListener('touchstart', function(e) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+    s.addEventListener('touchend', function(e) {
+      var dx = tx - e.changedTouches[0].clientX, dy = Math.abs(ty - e.changedTouches[0].clientY);
+      if (dx > 60 && dx > dy) close();
+    }, { passive: true });
+  })();
+
+  // ── App ───────────────────────────────────────────────────────
+  const TASKS_CONFIG = [
+    { key: "loginToday",      icon: "🔐", title: "Login Today",       desc: "Log into your FUKURO account today to keep your streak alive and earn daily points.",                   pts: 10,  autoComplete: true },
+    { key: "connectWallet",   icon: "💼", title: "Connect Wallet",    desc: "Link your wallet address to your account for identification and future rewards.",                        pts: 50  },
+    { key: "completeProfile", icon: "👤", title: "Complete Profile",  desc: "Fill in your profile information to unlock the complete profile bonus points.",                         pts: 30  },
+    { key: "referFriend",     icon: "🔗", title: "Refer a Friend",    desc: "Share your referral code with a friend. Earn 100 points when they join FUKURO.",                        pts: 100 },
+    { key: "earn500Points",   icon: "🏆", title: "Earn 500 Points",   desc: "Accumulate a total of 500 points across all your activities on the platform.",                          pts: 20  }
   ];
 
   let currentUser = null;
@@ -299,19 +321,14 @@
   window.onload = async () => {
     setTimeout(() => document.getElementById("loader").classList.add("hidden"), 1500);
     if (!token) { window.location.href = "login.html"; return; }
-
     try {
-      const pRes = await fetch(`${API}/protected/profile`, {
-        headers: { "Authorization": "Bearer " + token }
-      });
+      const pRes = await fetch(`${API}/protected/profile`, { headers: { "Authorization": "Bearer " + token } });
       if (!pRes.ok) { logout(); return; }
       const { user } = await pRes.json();
       currentUser = user;
-
       document.getElementById("sidebarAvatar").textContent = user.username[0].toUpperCase();
-      document.getElementById("sidebarName").textContent = user.username;
-      document.getElementById("sidebarEmail").textContent = user.email;
-
+      document.getElementById("sidebarName").textContent   = user.username;
+      document.getElementById("sidebarEmail").textContent  = user.email;
       renderAll(user);
     } catch (err) {
       console.error(err);
@@ -321,24 +338,18 @@
 
   function renderAll(user) {
     const tasks = user.tasks || {};
-    const done = TASKS_CONFIG.filter(t => tasks[t.key]).length;
-    const ptsEarned = TASKS_CONFIG.filter(t => tasks[t.key]).reduce((s, t) => s + t.pts, 0);
+    const done  = TASKS_CONFIG.filter(t => tasks[t.key]).length;
+    const ptsEarned    = TASKS_CONFIG.filter(t =>  tasks[t.key]).reduce((s, t) => s + t.pts, 0);
     const ptsRemaining = TASKS_CONFIG.filter(t => !tasks[t.key]).reduce((s, t) => s + t.pts, 0);
     const pct = Math.round((done / TASKS_CONFIG.length) * 100);
 
-    // Summary
-    document.getElementById("doneCount").textContent = `${done}/${TASKS_CONFIG.length}`;
-    document.getElementById("ptsEarned").textContent = ptsEarned;
-    document.getElementById("ptsRemaining").textContent = ptsRemaining;
+    document.getElementById("doneCount").textContent      = `${done}/${TASKS_CONFIG.length}`;
+    document.getElementById("ptsEarned").textContent      = ptsEarned;
+    document.getElementById("ptsRemaining").textContent   = ptsRemaining;
+    document.getElementById("progressLabel").textContent  = `${done} / ${TASKS_CONFIG.length} tasks`;
+    document.getElementById("progressPct").textContent    = `${pct}%`;
+    setTimeout(() => { document.getElementById("progressBar").style.width = pct + "%"; }, 200);
 
-    // Progress
-    document.getElementById("progressLabel").textContent = `${done} / ${TASKS_CONFIG.length} tasks`;
-    document.getElementById("progressPct").textContent = `${pct}%`;
-    setTimeout(() => {
-      document.getElementById("progressBar").style.width = pct + "%";
-    }, 200);
-
-    // Tasks grid
     const grid = document.getElementById("tasksGrid");
     grid.innerHTML = "";
     TASKS_CONFIG.forEach((t, i) => {
@@ -364,10 +375,16 @@
             ? `<div class="btn-done">✓ Done</div>`
             : t.autoComplete
               ? `<div class="btn-done" style="color:var(--muted);border-color:var(--border)">Auto</div>`
-              : `<button class="btn-complete" id="btn-${t.key}" onclick="completeTask('${t.key}', ${t.pts})">Complete</button>`
+              : `<button class="btn-complete" id="btn-${t.key}">Complete</button>`
           }
         </div>
       `;
+      // Wire up complete button via addEventListener (no inline onclick)
+      if (!isDone && !t.autoComplete) {
+        card.querySelector(`#btn-${t.key}`).addEventListener('click', function() {
+          completeTask(t.key, t.pts);
+        });
+      }
       grid.appendChild(card);
     });
   }
@@ -375,7 +392,6 @@
   async function completeTask(taskKey, pts) {
     const btn = document.getElementById(`btn-${taskKey}`);
     if (btn) { btn.disabled = true; btn.textContent = "..."; }
-
     try {
       const res = await fetch(`${API}/protected/task`, {
         method: "POST",
@@ -383,10 +399,9 @@
         body: JSON.stringify({ taskKey })
       });
       const data = await res.json();
-
       if (res.ok) {
         showToast(`✅ +${pts} pts earned!`, "success");
-        currentUser.tasks = data.tasks;
+        currentUser.tasks  = data.tasks;
         currentUser.points = data.points;
         renderAll(currentUser);
       } else {
@@ -410,22 +425,6 @@
     t.className = `toast ${type} show`;
     setTimeout(() => t.classList.remove("show"), 2500);
   }
-
-  function toggleSidebar() {
-  document.getElementById("sidebar").classList.toggle("open");
-  document.getElementById("sidebarOverlay").classList.toggle("show");
-  document.getElementById("hamburger").classList.toggle("open");
-}
-function closeSidebar() {
-  document.getElementById("sidebar").classList.remove("open");
-  document.getElementById("sidebarOverlay").classList.remove("show");
-  document.getElementById("hamburger").classList.remove("open");
-}
-document.querySelectorAll(".nav-item").forEach(item => {
-  item.addEventListener("click", () => {
-    if (window.innerWidth <= 768) closeSidebar();
-  });
-});
 </script>
 </body>
 </html>

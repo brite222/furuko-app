@@ -18,7 +18,7 @@
     .bg-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(200,245,66,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(200,245,66,0.03) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; z-index: 0; }
     .bg-glow { position: fixed; top: -300px; left: 50%; transform: translateX(-50%); width: 900px; height: 600px; background: radial-gradient(ellipse, rgba(200,245,66,0.06) 0%, transparent 65%); pointer-events: none; z-index: 0; }
 
-    .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+    .app { display: flex; flex-direction: column;  min-height: 100vh; }
 
     /* SIDEBAR */
     .sidebar.open { transform: translateX(0); box-shadow: 8px 0 32px rgba(0,0,0,0.6); }
@@ -125,7 +125,7 @@
 
     /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
-      .app { grid-template-columns: 1fr; }
+      .app {  }
       .sidebar-overlay { display: block; }
       .hamburger { display: flex; }
       .topbar { display: flex; }
@@ -173,10 +173,10 @@
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <aside class="sidebar" id="sidebar">
-   <div class="logo">
-  <img src="logo.jpg" alt="FUKURO" style="width:100%;max-width:160px;border-radius:12px;display:block;" />
-  <div class="logo-sub" style="margin-top:8px;">Ecosystem Dashboard</div>
-</div>
+    <div class="logo">
+      <div class="logo-text">FUKURO</div>
+      <div class="logo-sub">Ecosystem Dashboard</div>
+    </div>
     <nav class="nav">
       <div class="nav-label">Main</div>
       <a class="nav-item" href="dashboard.html"><span class="icon">⚡</span> Dashboard</a>
@@ -266,6 +266,9 @@
     }
     if (overlay) overlay.addEventListener('click', close);
 
+    var logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) logoutBtn.addEventListener('click', function() { logout(); });
+
     document.querySelectorAll('.nav-item').forEach(function(a) {
       a.addEventListener('click', function() { if (window.innerWidth <= 768) close(); });
     });
@@ -283,38 +286,6 @@
 
   const API = "https://zestful-wisdom-production-c5b7.up.railway.app/api";
   const token = localStorage.getItem("token");
-
-  // ── Sidebar ──────────────────────────────────────────────────
-  (function() {
-    var sidebar   = document.getElementById('sidebar');
-    var overlay   = document.getElementById('sidebarOverlay');
-    var hamburger = document.getElementById('hamburger');
-    var logoutBtn = document.getElementById('logoutBtn');
-
-    function openSidebar() {
-      sidebar.classList.add('open');
-      overlay.classList.add('show');
-      hamburger.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-    window.closeSidebar  = closeSidebar;
-    window.toggleSidebar = function() { sidebar.classList.contains('open') ? closeSidebar() : openSidebar(); };
-
-    hamburger.addEventListener('click', function(e) { e.stopPropagation(); window.toggleSidebar(); });
-    overlay.addEventListener('click', closeSidebar);
-    if (logoutBtn) logoutBtn.addEventListener('click', logout);
-
-    document.querySelectorAll('.nav-item').forEach(function(a) {
-      a.addEventListener('click', function() { if (window.innerWidth <= 768) closeSidebar(); });
-    });
-
-    var tx = 0, ty = 0;
-    sidebar.addEventListener('touchstart', function(e) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
-    sidebar.addEventListener('touchend', function(e) {
-      var dx = tx - e.changedTouches[0].clientX, dy = Math.abs(ty - e.changedTouches[0].clientY);
-      if (dx > 60 && dx > dy) closeSidebar();
-    }, { passive: true });
-  })();
 
   window.onload = async () => {
     setTimeout(() => document.getElementById("loader").classList.add("hidden"), 1500);

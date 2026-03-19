@@ -287,6 +287,8 @@
       .card-title { font-size: 16px; }
       .ref-grid { grid-template-columns: 1fr; }
     }
+  
+    @media (min-width: 769px) { .sidebar { transform: translateX(0) !important; } .app { margin-left: 240px; } }
   </style>
 </head>
 <body>
@@ -304,10 +306,10 @@
 
 <!-- Sidebar outside .app to avoid stacking context trap -->
 <aside class="sidebar" id="sidebar">
- <div class="logo">
-  <img src="logo.jpg" alt="FUKURO" style="width:100%;max-width:160px;border-radius:12px;display:block;" />
-  <div class="logo-sub" style="margin-top:8px;">Ecosystem Dashboard</div>
-</div>
+  <div class="logo">
+    <div class="logo-text">FUKURO</div>
+    <div class="logo-sub">Ecosystem Dashboard</div>
+  </div>
   <nav class="nav">
     <div class="nav-label">Main</div>
     <a class="nav-item active" href="dashboard.html"><span class="icon">⚡</span> Dashboard</a>
