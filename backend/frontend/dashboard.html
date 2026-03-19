@@ -46,7 +46,7 @@
 
     .nav { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
     .nav-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; padding: 0 8px; margin: 12px 0 6px; }
-    .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; color: var(--muted2); font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; border: 1px solid transparent; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; color: var(--muted2); font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; border: 1px solid transparent; -webkit-tap-highlight-color: transparent; }
     .nav-item:hover { color: var(--text); background: var(--card); }
     .nav-item.active { color: var(--accent); background: rgba(200,245,66,0.08); border-color: rgba(200,245,66,0.15); }
     .nav-item .icon { width: 18px; text-align: center; font-size: 16px; }
@@ -58,7 +58,7 @@
     .user-info { flex: 1; min-width: 0; }
     .user-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .user-email { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .logout-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; transition: color 0.2s; }
+    .logout-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; transition: color 0.2s; -webkit-tap-highlight-color: transparent; }
     .logout-btn:hover { color: #fa6d6d; }
 
     /* ── TOPBAR ── */
@@ -71,11 +71,31 @@
     @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); } }
 
     /* ── HAMBURGER ── */
-    .hamburger { display: none; flex-direction: column; justify-content: center; align-items: center; gap: 5px; width: 40px; height: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: border-color 0.2s; padding: 0; flex-shrink: 0; }
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      width: 44px;
+      height: 44px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      padding: 0;
+      flex-shrink: 0;
+      /* Ensure it's always tappable */
+      position: relative;
+      z-index: 1001;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
     .hamburger:hover { border-color: rgba(200,245,66,0.3); }
     .hamburger span { display: block; width: 18px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.3s ease; pointer-events: none; }
     .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
     .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
     /* ── BACKDROP ── */
@@ -84,11 +104,17 @@
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.65);
+      /* CRITICAL: backdrop must be BELOW the sidebar (z-index 999) but above everything else */
       z-index: 998;
       opacity: 0;
       transition: opacity 0.3s ease;
+      /* Must not block pointer events when hidden */
+      pointer-events: none;
     }
-    .backdrop.show { opacity: 1; }
+    .backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
 
     /* ── MAIN ── */
     .main { padding: 32px; display: flex; flex-direction: column; gap: 24px; overflow-y: auto; }
@@ -138,7 +164,7 @@
     .wallet-icon { font-size: 20px; }
     .wallet-addr { font-family: var(--font-mono); font-size: 12px; color: var(--muted2); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .wallet-addr.connected { color: var(--accent2); }
-    .copy-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; transition: color 0.2s; }
+    .copy-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; transition: color 0.2s; -webkit-tap-highlight-color: transparent; }
     .copy-btn:hover { color: var(--accent); }
     .wallet-input-wrap { display: flex; gap: 8px; margin-top: 12px; }
     .wallet-input { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); font-family: var(--font-mono); font-size: 12px; outline: none; transition: border-color 0.2s; min-width: 0; }
@@ -146,7 +172,7 @@
     .wallet-input::placeholder { color: var(--muted); }
 
     /* ── BUTTONS ── */
-    .btn { padding: 10px 18px; border-radius: 8px; border: none; cursor: pointer; font-family: var(--font-body); font-weight: 600; font-size: 13px; transition: all 0.2s; white-space: nowrap; }
+    .btn { padding: 10px 18px; border-radius: 8px; border: none; cursor: pointer; font-family: var(--font-body); font-weight: 600; font-size: 13px; transition: all 0.2s; white-space: nowrap; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     .btn-accent { background: var(--accent); color: #000; }
     .btn-accent:hover { background: #d4ff44; transform: translateY(-1px); }
     .btn-accent2 { background: rgba(66,245,200,0.12); color: var(--accent2); border: 1px solid rgba(66,245,200,0.25); }
@@ -155,7 +181,7 @@
     /* ── TASKS ── */
     .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .task-list { display: flex; flex-direction: column; gap: 10px; }
-    .task-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--card2); border-radius: 10px; border: 1px solid var(--border); transition: border-color 0.2s; cursor: pointer; }
+    .task-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--card2); border-radius: 10px; border: 1px solid var(--border); transition: border-color 0.2s; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     .task-item:hover { border-color: rgba(200,245,66,0.2); }
     .task-item.done { opacity: 0.5; }
     .task-check { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--muted); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; transition: all 0.2s; }
@@ -195,7 +221,7 @@
     @keyframes loadBar { from { width: 0; } to { width: 100%; } }
 
     /* ── TOAST ── */
-    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 14px; z-index: 9999; transform: translateY(80px); opacity: 0; transition: all 0.3s ease; max-width: calc(100vw - 32px); }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 14px; z-index: 9999; transform: translateY(80px); opacity: 0; transition: all 0.3s ease; max-width: calc(100vw - 32px); pointer-events: none; }
     .toast.show { transform: translateY(0); opacity: 1; }
     .toast.success { border-color: rgba(200,245,66,0.3); }
     .toast.error { border-color: rgba(250,109,109,0.3); }
@@ -210,23 +236,28 @@
     @media (max-width: 768px) {
       .app { grid-template-columns: 1fr; }
 
-      /* Sidebar becomes a drawer */
+      /* Sidebar becomes a fixed drawer */
       .sidebar {
         position: fixed;
         top: 0;
         left: 0;
         width: 280px;
         height: 100%;
+        height: 100dvh; /* dynamic viewport on mobile */
         transform: translateX(-100%);
         transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
         animation: none;
+        /* CRITICAL: sidebar must be ABOVE the backdrop */
         z-index: 999;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
         overscroll-behavior: contain;
       }
 
-      .sidebar.open { transform: translateX(0); box-shadow: 8px 0 32px rgba(0,0,0,0.6); }
+      .sidebar.open {
+        transform: translateX(0);
+        box-shadow: 8px 0 32px rgba(0,0,0,0.6);
+      }
 
       /* Show backdrop only on mobile */
       .backdrop { display: block; }
@@ -269,6 +300,7 @@
 <div class="bg-grid"></div>
 <div class="bg-glow"></div>
 <div class="toast" id="toast"></div>
+<!-- Backdrop: sits between main content and sidebar -->
 <div class="backdrop" id="backdrop"></div>
 
 <div class="app">
@@ -297,14 +329,15 @@
           <div class="user-name" id="sidebarName">Loading...</div>
           <div class="user-email" id="sidebarEmail">—</div>
         </div>
-        <button class="logout-btn" onclick="logout()" title="Logout">⏻</button>
+        <button class="logout-btn" id="logoutBtn" title="Logout">⏻</button>
       </div>
     </div>
   </aside>
 
   <header class="topbar">
     <div class="topbar-left">
-      <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+      <!-- No inline onclick — event listener attached in JS -->
+      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
       <div class="page-title">DASHBOARD</div>
@@ -363,11 +396,11 @@
         <div class="wallet-display">
           <div class="wallet-icon">💼</div>
           <div class="wallet-addr" id="walletDisplay">No wallet connected</div>
-          <button class="copy-btn" onclick="copyWallet()" title="Copy">⎘</button>
+          <button class="copy-btn" id="copyWalletBtn" title="Copy">⎘</button>
         </div>
         <div class="wallet-input-wrap">
           <input class="wallet-input" id="walletInput" placeholder="0x... wallet address" />
-          <button class="btn btn-accent2" onclick="saveWallet()">Save</button>
+          <button class="btn btn-accent2" id="saveWalletBtn">Save</button>
         </div>
       </div>
     </div>
@@ -398,7 +431,7 @@
         </div>
         <div class="ref-link-row">
           <input class="wallet-input" id="refLink" readonly style="flex:1;font-size:11px;" placeholder="Loading referral link...">
-          <button class="btn btn-accent2" onclick="copyRefLink()">Copy Link</button>
+          <button class="btn btn-accent2" id="copyRefBtn">Copy Link</button>
         </div>
       </div>
 
@@ -415,268 +448,308 @@
 </div>
 
 <script>
-// ── Wait for DOM before touching elements ──────────────────────
-document.addEventListener("DOMContentLoaded", function() {
-
-  var sidebarEl  = document.getElementById("sidebar");
-  var backdropEl = document.getElementById("backdrop");
-  var hamburgerEl = document.getElementById("hamburger");
-
-  function openSidebar() {
-    sidebarEl.classList.add("open");
-    backdropEl.classList.add("show");
-    hamburgerEl.classList.add("open");
-    document.body.style.overflow = "hidden";
+// ── All sidebar logic lives here, runs after DOM is ready ──────
+(function() {
+  // Wait for DOM
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
 
-  function closeSidebar() {
-    sidebarEl.classList.remove("open");
-    backdropEl.classList.remove("show");
-    hamburgerEl.classList.remove("open");
-    document.body.style.overflow = "";
-  }
+  function init() {
+    var sidebar    = document.getElementById('sidebar');
+    var backdrop   = document.getElementById('backdrop');
+    var hamburger  = document.getElementById('hamburger');
+    var logoutBtn  = document.getElementById('logoutBtn');
+    var copyWalletBtn = document.getElementById('copyWalletBtn');
+    var saveWalletBtn = document.getElementById('saveWalletBtn');
+    var copyRefBtn    = document.getElementById('copyRefBtn');
 
-  window.toggleSidebar = function() {
-    if (sidebarEl.classList.contains("open")) {
+    // ── Sidebar open/close ──────────────────────────────────────
+    function openSidebar() {
+      sidebar.classList.add('open');
+      backdrop.classList.add('show');
+      hamburger.classList.add('open');
+      hamburger.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+      sidebar.classList.remove('open');
+      backdrop.classList.remove('show');
+      hamburger.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+
+    // Hamburger: use both click AND touchend for max compatibility
+    hamburger.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (sidebar.classList.contains('open')) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
+    });
+
+    // Backdrop tap closes sidebar
+    backdrop.addEventListener('click', closeSidebar);
+    backdrop.addEventListener('touchend', function(e) {
+      e.preventDefault();
       closeSidebar();
-    } else {
-      openSidebar();
-    }
-  };
-
-  // Close when backdrop is tapped
-  backdropEl.addEventListener("click", closeSidebar);
-
-  // Close when any nav link is tapped on mobile
-  sidebarEl.querySelectorAll("a.nav-item").forEach(function(link) {
-    link.addEventListener("click", function() {
-      if (window.innerWidth <= 768) closeSidebar();
     });
-  });
 
-  // Swipe left to close
-  var touchStartX = 0;
-  sidebarEl.addEventListener("touchstart", function(e) {
-    touchStartX = e.touches[0].clientX;
-  }, { passive: true });
-
-  sidebarEl.addEventListener("touchend", function(e) {
-    var diff = touchStartX - e.changedTouches[0].clientX;
-    if (diff > 60) closeSidebar();
-  }, { passive: true });
-
-});
-
-// ── App logic ──────────────────────────────────────────────────
-var API   = "https://zestful-wisdom-production-c5b7.up.railway.app/api";
-var token = localStorage.getItem("token");
-
-var TASKS_CONFIG = [
-  { key: "loginToday",      text: "Login today",           pts: 10  },
-  { key: "connectWallet",   text: "Connect wallet",        pts: 50  },
-  { key: "completeProfile", text: "Complete your profile", pts: 30  },
-  { key: "referFriend",     text: "Refer a friend",        pts: 100 },
-  { key: "earn500Points",   text: "Earn 500 points",       pts: 20  },
-];
-
-window.onload = async function() {
-  setTimeout(function() {
-    document.getElementById("loader").classList.add("hidden");
-  }, 1500);
-
-  if (!token) { window.location.href = "login.html"; return; }
-
-  try {
-    var pRes = await fetch(API + "/protected/profile", { headers: { "Authorization": "Bearer " + token } });
-    if (!pRes.ok) { logout(); return; }
-    var pData = await pRes.json();
-    var user = pData.user;
-
-    loadUser(user);
-    renderTasks(user.tasks);
-    loadWallet(user.wallet);
-
-    var lRes = await fetch(API + "/protected/leaderboard", { headers: { "Authorization": "Bearer " + token } });
-    var lData = await lRes.json();
-    renderLeaderboard(lData.leaderboard, user.username);
-
-    var wRes = await fetch(API + "/protected/weekly", { headers: { "Authorization": "Bearer " + token } });
-    var wData = await wRes.json();
-    renderChart(wData.weekly);
-
-    var rRes = await fetch(API + "/protected/referral", { headers: { "Authorization": "Bearer " + token } });
-    var rData = await rRes.json();
-    document.getElementById("refCode").textContent  = rData.referralCode;
-    document.getElementById("refLink").value        = rData.referralLink;
-    document.getElementById("refCount").textContent = rData.referralCount + " referrals";
-    document.getElementById("refPts").textContent   = rData.pointsEarned.toLocaleString();
-
-  } catch(err) {
-    console.error(err);
-    showToast("Failed to load dashboard ❌", "error");
-  }
-};
-
-function loadUser(user) {
-  document.getElementById("sidebarAvatar").textContent = user.username[0].toUpperCase();
-  document.getElementById("sidebarName").textContent   = user.username;
-  document.getElementById("sidebarEmail").textContent  = user.email;
-  document.getElementById("userRank").textContent      = "#" + user.rank;
-  animateCount("totalPoints", 0, user.points, 1200);
-  animateCount("streak", 0, user.streak, 800);
-}
-
-function animateCount(id, from, to, duration) {
-  var el = document.getElementById(id);
-  var start = performance.now();
-  function update(now) {
-    var p = Math.min((now - start) / duration, 1);
-    var ease = 1 - Math.pow(1 - p, 3);
-    el.textContent = Math.floor(from + (to - from) * ease).toLocaleString();
-    if (p < 1) requestAnimationFrame(update);
-  }
-  requestAnimationFrame(update);
-}
-
-function renderChart(weekly) {
-  var DAYS = ["M","T","W","T","F","S","S"];
-  var values = weekly.map(function(d) { return d.points; });
-  var max = Math.max.apply(null, values) || 1;
-  var chart = document.getElementById("chart");
-  chart.innerHTML = "";
-  weekly.forEach(function(day, i) {
-    var date = new Date(day.date + "T00:00:00");
-    var dayLabel = DAYS[date.getDay() === 0 ? 6 : date.getDay() - 1];
-    var wrap = document.createElement("div");
-    wrap.className = "bar-wrap";
-    wrap.innerHTML =
-      '<div class="bar ' + (day.points === max && max > 0 ? "highlight" : "") + '"' +
-      ' style="height:' + ((day.points/max)*100) + '%; animation-delay:' + (i*0.1) + 's"' +
-      ' title="' + day.points + ' pts"></div>' +
-      '<div class="bar-label">' + dayLabel + '</div>';
-    chart.appendChild(wrap);
-  });
-}
-
-function renderTasks(userTasks) {
-  var list = document.getElementById("taskList");
-  list.innerHTML = "";
-  var doneCount = 0;
-  TASKS_CONFIG.forEach(function(t) {
-    var done = userTasks && userTasks[t.key] ? true : false;
-    if (done) doneCount++;
-    var item = document.createElement("div");
-    item.className = "task-item" + (done ? " done" : "");
-    item.innerHTML =
-      '<div class="task-check">' + (done ? "✓" : "") + '</div>' +
-      '<div class="task-text">' + t.text + '</div>' +
-      '<div class="task-pts">+' + t.pts + ' pts</div>';
-    if (!done) {
-      (function(taskKey, pts) {
-        item.onclick = function() { completeTask(taskKey, pts); };
-      })(t.key, t.pts);
-    }
-    list.appendChild(item);
-  });
-  document.getElementById("tasksDone").textContent    = doneCount + "/" + TASKS_CONFIG.length;
-  document.getElementById("taskProgress").textContent = doneCount + " / " + TASKS_CONFIG.length;
-}
-
-async function completeTask(taskKey, pts) {
-  try {
-    var res = await fetch(API + "/protected/task", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-      body: JSON.stringify({ taskKey: taskKey })
+    // Nav links close sidebar on mobile
+    var navLinks = sidebar.querySelectorAll('a.nav-item');
+    navLinks.forEach(function(link) {
+      link.addEventListener('click', function() {
+        if (window.innerWidth <= 768) closeSidebar();
+      });
     });
-    var data = await res.json();
-    if (res.ok) {
-      showToast("✅ +" + pts + " pts earned!", "success");
-      animateCount("totalPoints", 0, data.points, 800);
-      renderTasks(data.tasks);
-    } else {
-      showToast(data.message, "error");
+
+    // Swipe left on sidebar to close
+    var touchStartX = 0;
+    var touchStartY = 0;
+    sidebar.addEventListener('touchstart', function(e) {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    sidebar.addEventListener('touchend', function(e) {
+      var dx = touchStartX - e.changedTouches[0].clientX;
+      var dy = Math.abs(touchStartY - e.changedTouches[0].clientY);
+      // Only treat as swipe if horizontal movement dominates
+      if (dx > 60 && dx > dy) closeSidebar();
+    }, { passive: true });
+
+    // ── Button wiring ───────────────────────────────────────────
+    if (logoutBtn)     logoutBtn.addEventListener('click', logout);
+    if (copyWalletBtn) copyWalletBtn.addEventListener('click', copyWallet);
+    if (saveWalletBtn) saveWalletBtn.addEventListener('click', saveWallet);
+    if (copyRefBtn)    copyRefBtn.addEventListener('click', copyRefLink);
+
+    // ── App bootstrap ───────────────────────────────────────────
+    setTimeout(function() {
+      var loader = document.getElementById('loader');
+      if (loader) loader.classList.add('hidden');
+    }, 1500);
+
+    var token = localStorage.getItem('token');
+    if (!token) { window.location.href = 'login.html'; return; }
+
+    loadDashboard(token);
+  }
+
+  // ── API ───────────────────────────────────────────────────────
+  var API = 'https://zestful-wisdom-production-c5b7.up.railway.app/api';
+
+  var TASKS_CONFIG = [
+    { key: 'loginToday',      text: 'Login today',           pts: 10  },
+    { key: 'connectWallet',   text: 'Connect wallet',        pts: 50  },
+    { key: 'completeProfile', text: 'Complete your profile', pts: 30  },
+    { key: 'referFriend',     text: 'Refer a friend',        pts: 100 },
+    { key: 'earn500Points',   text: 'Earn 500 points',       pts: 20  },
+  ];
+
+  async function loadDashboard(token) {
+    try {
+      var pRes = await fetch(API + '/protected/profile', { headers: { 'Authorization': 'Bearer ' + token } });
+      if (!pRes.ok) { logout(); return; }
+      var pData = await pRes.json();
+      var user = pData.user;
+
+      loadUser(user);
+      renderTasks(user.tasks, token);
+      loadWallet(user.wallet);
+
+      var lRes = await fetch(API + '/protected/leaderboard', { headers: { 'Authorization': 'Bearer ' + token } });
+      var lData = await lRes.json();
+      renderLeaderboard(lData.leaderboard, user.username);
+
+      var wRes = await fetch(API + '/protected/weekly', { headers: { 'Authorization': 'Bearer ' + token } });
+      var wData = await wRes.json();
+      renderChart(wData.weekly);
+
+      var rRes = await fetch(API + '/protected/referral', { headers: { 'Authorization': 'Bearer ' + token } });
+      var rData = await rRes.json();
+      document.getElementById('refCode').textContent  = rData.referralCode;
+      document.getElementById('refLink').value        = rData.referralLink;
+      document.getElementById('refCount').textContent = rData.referralCount + ' referrals';
+      document.getElementById('refPts').textContent   = rData.pointsEarned.toLocaleString();
+
+    } catch(err) {
+      console.error(err);
+      showToast('Failed to load dashboard ❌', 'error');
     }
-  } catch(e) {
-    showToast("Network error ❌", "error");
   }
-}
 
-function renderLeaderboard(leaderboard, currentUsername) {
-  var list = document.getElementById("lbList");
-  list.innerHTML = "";
-  leaderboard.forEach(function(u, i) {
-    var isYou = u.username === currentUsername;
-    var item = document.createElement("div");
-    item.className = "lb-item" + (isYou ? " you" : "");
-    item.innerHTML =
-      '<div class="lb-rank">' + (i+1) + '</div>' +
-      '<div class="lb-avatar">' + u.username[0].toUpperCase() + '</div>' +
-      '<div class="lb-name">' + u.username + (isYou ? ' <span class="lb-you-tag">YOU</span>' : "") + '</div>' +
-      '<div class="lb-pts">' + u.points.toLocaleString() + '</div>';
-    list.appendChild(item);
-  });
-}
-
-function loadWallet(walletAddr) {
-  if (walletAddr) {
-    document.getElementById("walletDisplay").textContent = walletAddr;
-    document.getElementById("walletDisplay").classList.add("connected");
-    document.getElementById("walletStatus").textContent = "Connected";
-    document.getElementById("walletInput").value = walletAddr;
+  function loadUser(user) {
+    document.getElementById('sidebarAvatar').textContent = user.username[0].toUpperCase();
+    document.getElementById('sidebarName').textContent   = user.username;
+    document.getElementById('sidebarEmail').textContent  = user.email;
+    document.getElementById('userRank').textContent      = '#' + user.rank;
+    animateCount('totalPoints', 0, user.points, 1200);
+    animateCount('streak', 0, user.streak, 800);
   }
-}
 
-async function saveWallet() {
-  var addr = document.getElementById("walletInput").value.trim();
-  if (!addr) { showToast("⚠️ Enter a wallet address", "error"); return; }
-  try {
-    var res = await fetch(API + "/protected/wallet", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-      body: JSON.stringify({ wallet: addr })
+  function animateCount(id, from, to, duration) {
+    var el = document.getElementById(id);
+    var start = performance.now();
+    function update(now) {
+      var p = Math.min((now - start) / duration, 1);
+      var ease = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.floor(from + (to - from) * ease).toLocaleString();
+      if (p < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+  }
+
+  function renderChart(weekly) {
+    var DAYS = ['M','T','W','T','F','S','S'];
+    var values = weekly.map(function(d) { return d.points; });
+    var max = Math.max.apply(null, values) || 1;
+    var chart = document.getElementById('chart');
+    chart.innerHTML = '';
+    weekly.forEach(function(day, i) {
+      var date = new Date(day.date + 'T00:00:00');
+      var dayLabel = DAYS[date.getDay() === 0 ? 6 : date.getDay() - 1];
+      var wrap = document.createElement('div');
+      wrap.className = 'bar-wrap';
+      wrap.innerHTML =
+        '<div class="bar ' + (day.points === max && max > 0 ? 'highlight' : '') + '"' +
+        ' style="height:' + ((day.points/max)*100) + '%; animation-delay:' + (i*0.1) + 's"' +
+        ' title="' + day.points + ' pts"></div>' +
+        '<div class="bar-label">' + dayLabel + '</div>';
+      chart.appendChild(wrap);
     });
-    var data = await res.json();
-    if (res.ok) {
-      document.getElementById("walletDisplay").textContent = addr;
-      document.getElementById("walletDisplay").classList.add("connected");
-      document.getElementById("walletStatus").textContent = "Connected";
-      animateCount("totalPoints", 0, data.points, 800);
-      renderTasks(data.tasks);
-      showToast("💼 Wallet saved! +50 pts", "success");
-    } else {
-      showToast(data.message, "error");
-    }
-  } catch(e) {
-    showToast("Network error ❌", "error");
   }
-}
 
-function copyWallet() {
-  var addr = document.getElementById("walletDisplay").textContent;
-  if (addr === "No wallet connected") return;
-  navigator.clipboard.writeText(addr);
-  showToast("📋 Address copied!", "success");
-}
+  function renderTasks(userTasks, token) {
+    var list = document.getElementById('taskList');
+    list.innerHTML = '';
+    var doneCount = 0;
+    TASKS_CONFIG.forEach(function(t) {
+      var done = userTasks && userTasks[t.key] ? true : false;
+      if (done) doneCount++;
+      var item = document.createElement('div');
+      item.className = 'task-item' + (done ? ' done' : '');
+      item.innerHTML =
+        '<div class="task-check">' + (done ? '✓' : '') + '</div>' +
+        '<div class="task-text">' + t.text + '</div>' +
+        '<div class="task-pts">+' + t.pts + ' pts</div>';
+      if (!done) {
+        (function(taskKey, pts) {
+          item.addEventListener('click', function() { completeTask(taskKey, pts, token); });
+        })(t.key, t.pts);
+      }
+      list.appendChild(item);
+    });
+    document.getElementById('tasksDone').textContent    = doneCount + '/' + TASKS_CONFIG.length;
+    document.getElementById('taskProgress').textContent = doneCount + ' / ' + TASKS_CONFIG.length;
+  }
 
-function copyRefLink() {
-  var link = document.getElementById("refLink").value;
-  navigator.clipboard.writeText(link);
-  showToast("🔗 Referral link copied!", "success");
-}
+  async function completeTask(taskKey, pts, token) {
+    try {
+      var res = await fetch(API + '/protected/task', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ taskKey: taskKey })
+      });
+      var data = await res.json();
+      if (res.ok) {
+        showToast('✅ +' + pts + ' pts earned!', 'success');
+        animateCount('totalPoints', 0, data.points, 800);
+        renderTasks(data.tasks, token);
+      } else {
+        showToast(data.message, 'error');
+      }
+    } catch(e) {
+      showToast('Network error ❌', 'error');
+    }
+  }
 
-function logout() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-  window.location.href = "login.html";
-}
+  function renderLeaderboard(leaderboard, currentUsername) {
+    var list = document.getElementById('lbList');
+    list.innerHTML = '';
+    leaderboard.forEach(function(u, i) {
+      var isYou = u.username === currentUsername;
+      var item = document.createElement('div');
+      item.className = 'lb-item' + (isYou ? ' you' : '');
+      item.innerHTML =
+        '<div class="lb-rank">' + (i+1) + '</div>' +
+        '<div class="lb-avatar">' + u.username[0].toUpperCase() + '</div>' +
+        '<div class="lb-name">' + u.username + (isYou ? ' <span class="lb-you-tag">YOU</span>' : '') + '</div>' +
+        '<div class="lb-pts">' + u.points.toLocaleString() + '</div>';
+      list.appendChild(item);
+    });
+  }
 
-function showToast(msg, type) {
-  var t = document.getElementById("toast");
-  t.textContent = msg;
-  t.className = "toast " + (type || "") + " show";
-  setTimeout(function() { t.classList.remove("show"); }, 2500);
-}
+  function loadWallet(walletAddr) {
+    if (walletAddr) {
+      document.getElementById('walletDisplay').textContent = walletAddr;
+      document.getElementById('walletDisplay').classList.add('connected');
+      document.getElementById('walletStatus').textContent = 'Connected';
+      document.getElementById('walletInput').value = walletAddr;
+    }
+  }
+
+  async function saveWallet() {
+    var token = localStorage.getItem('token');
+    var addr = document.getElementById('walletInput').value.trim();
+    if (!addr) { showToast('⚠️ Enter a wallet address', 'error'); return; }
+    try {
+      var res = await fetch(API + '/protected/wallet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ wallet: addr })
+      });
+      var data = await res.json();
+      if (res.ok) {
+        document.getElementById('walletDisplay').textContent = addr;
+        document.getElementById('walletDisplay').classList.add('connected');
+        document.getElementById('walletStatus').textContent = 'Connected';
+        animateCount('totalPoints', 0, data.points, 800);
+        renderTasks(data.tasks, token);
+        showToast('💼 Wallet saved! +50 pts', 'success');
+      } else {
+        showToast(data.message, 'error');
+      }
+    } catch(e) {
+      showToast('Network error ❌', 'error');
+    }
+  }
+
+  function copyWallet() {
+    var addr = document.getElementById('walletDisplay').textContent;
+    if (addr === 'No wallet connected') return;
+    navigator.clipboard.writeText(addr);
+    showToast('📋 Address copied!', 'success');
+  }
+
+  function copyRefLink() {
+    var link = document.getElementById('refLink').value;
+    navigator.clipboard.writeText(link);
+    showToast('🔗 Referral link copied!', 'success');
+  }
+
+  function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = 'login.html';
+  }
+
+  function showToast(msg, type) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast ' + (type || '') + ' show';
+    setTimeout(function() { t.classList.remove('show'); }, 2500);
+  }
+
+  // Expose logout globally (used nowhere now, but kept for safety)
+  window.logout = logout;
+
+})();
 </script>
 </body>
 </html>
