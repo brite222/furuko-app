@@ -382,16 +382,25 @@
 
 <script>
   function toggleSidebar() {
-    document.getElementById("sidebar").classList.toggle("open");
-    document.getElementById("sidebarOverlay").classList.toggle("show");
-    document.getElementById("hamburger").classList.toggle("open");
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("sidebarOverlay");
+  const hamburger = document.getElementById("hamburger");
+  sidebar.classList.toggle("open");
+  overlay.classList.toggle("show");
+  hamburger.classList.toggle("open");
+  if (sidebar.classList.contains("open")) {
+    sidebar.style.zIndex = "55";
+  } else {
+    sidebar.style.zIndex = "50";
   }
+}
 
-  function closeSidebar() {
-    document.getElementById("sidebar").classList.remove("open");
-    document.getElementById("sidebarOverlay").classList.remove("show");
-    document.getElementById("hamburger").classList.remove("open");
-  }
+function closeSidebar() {
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("sidebarOverlay").classList.remove("show");
+  document.getElementById("hamburger").classList.remove("open");
+  document.getElementById("sidebar").style.zIndex = "50";
+}
 
   const API   = "https://zestful-wisdom-production-c5b7.up.railway.app/api";
   const token = localStorage.getItem("token");
