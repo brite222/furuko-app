@@ -64,7 +64,7 @@
 
     /* OVERLAY */
    
-.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 49; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 40; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
 .sidebar-overlay.show { opacity: 1; pointer-events: all; }
 
     /* MAIN */
@@ -187,17 +187,21 @@
     @media (max-width: 768px) {
       .app { grid-template-columns: 1fr; }
       .sidebar {
-    display: flex !important;
-    position: fixed !important;
-    left: 0 !important;
-    top: 0 !important;
-    height: 100vh !important;
-    width: 260px !important;
-    transform: translateX(-100%) !important;
-    transition: transform 0.3s ease !important;
-    animation: none !important;
-    z-index: 55 !important;
-  }
+  display: flex !important;
+  position: fixed !important;
+  left: 0 !important;
+  top: 0 !important;
+  height: 100vh !important;
+  width: 260px !important;
+  transform: translateX(-100%) !important;
+  transition: transform 0.3s ease !important;
+  animation: none !important;
+  z-index: 60 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: all !important;
+}
+.sidebar.open { transform: translateX(0) !important; }
       .sidebar.open { transform: translateX(0) !important; }
       .sidebar-overlay { display: block; }
       .hamburger { display: flex; }
@@ -381,17 +385,19 @@
 </div>
 
 <script>
-  function toggleSidebar() {
+ function toggleSidebar() {
   const sidebar = document.getElementById("sidebar");
   const overlay = document.getElementById("sidebarOverlay");
   const hamburger = document.getElementById("hamburger");
-  sidebar.classList.toggle("open");
-  overlay.classList.toggle("show");
-  hamburger.classList.toggle("open");
-  if (sidebar.classList.contains("open")) {
-    sidebar.style.zIndex = "55";
+  const isOpen = sidebar.classList.contains("open");
+  if (isOpen) {
+    sidebar.classList.remove("open");
+    overlay.classList.remove("show");
+    hamburger.classList.remove("open");
   } else {
-    sidebar.style.zIndex = "50";
+    sidebar.classList.add("open");
+    overlay.classList.add("show");
+    hamburger.classList.add("open");
   }
 }
 
@@ -399,7 +405,6 @@ function closeSidebar() {
   document.getElementById("sidebar").classList.remove("open");
   document.getElementById("sidebarOverlay").classList.remove("show");
   document.getElementById("hamburger").classList.remove("open");
-  document.getElementById("sidebar").style.zIndex = "50";
 }
 
   const API   = "https://zestful-wisdom-production-c5b7.up.railway.app/api";
