@@ -19,15 +19,35 @@
     body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; overflow-x: hidden; }
     .bg-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(200,245,66,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(200,245,66,0.03) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; z-index: 0; }
     .bg-glow { position: fixed; top: -300px; left: 50%; transform: translateX(-50%); width: 900px; height: 600px; background: radial-gradient(ellipse, rgba(200,245,66,0.05) 0%, transparent 65%); pointer-events: none; z-index: 0; }
-    .app { display: grid; grid-template-columns: 240px 1fr; grid-template-rows: auto 1fr; min-height: 100vh; position: relative; z-index: 1; }
-    .sidebar { grid-row: 1 / -1; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 32px 0; position: sticky; top: 0; height: 100vh; animation: slideInLeft 0.5s ease both; }
-    @keyframes slideInLeft { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    /* .app has NO position/z-index — no stacking context */
+    .app { display: grid; grid-template-columns: 1fr; min-height: 100vh; }
+
+    /* SIDEBAR — always fixed, always a direct body child */
+    .sidebar {
+      position: fixed !important;
+      top: 0; left: 0;
+      width: 240px; height: 100%; height: 100dvh;
+      background: var(--surface); border-right: 1px solid var(--border);
+      display: flex !important; flex-direction: column; padding: 32px 0;
+      overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+      z-index: 200 !important;
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    .sidebar.open { transform: translateX(0) !important; box-shadow: 8px 0 32px rgba(0,0,0,0.6); }
+
+    @media (min-width: 769px) {
+      .sidebar { transform: translateX(0) !important; box-shadow: none !important; }
+      .app { margin-left: 240px; }
+    }
+
     .logo { padding: 0 24px 32px; border-bottom: 1px solid var(--border); }
     .logo-text { font-family: var(--font-display); font-size: 36px; letter-spacing: 4px; color: var(--accent); line-height: 1; }
     .logo-sub { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
     .nav { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
     .nav-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; padding: 0 8px; margin: 12px 0 6px; }
-    .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; color: var(--muted2); font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; border: 1px solid transparent; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; color: var(--muted2); font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; border: 1px solid transparent; -webkit-tap-highlight-color: transparent; }
     .nav-item:hover { color: var(--text); background: var(--card); }
     .nav-item.active { color: var(--accent); background: rgba(200,245,66,0.08); border-color: rgba(200,245,66,0.15); }
     .nav-item .icon { width: 18px; text-align: center; font-size: 16px; }
@@ -38,14 +58,28 @@
     .user-info { flex: 1; min-width: 0; }
     .user-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .user-email { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .logout-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; transition: color 0.2s; }
+    .logout-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; transition: color 0.2s; -webkit-tap-highlight-color: transparent; }
     .logout-btn:hover { color: #fa6d6d; }
-    .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; height: 64px; display: flex; align-items: center; justify-content: space-between; animation: fadeDown 0.5s ease both; }
-    @keyframes fadeDown { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* TOPBAR — z-index 150: above overlay(100), below sidebar(200) */
+    .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 150; }
     .page-title { font-family: var(--font-display); font-size: 28px; letter-spacing: 2px; }
     .status-dot { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted2); font-family: var(--font-mono); }
     .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); } }
+
+    /* HAMBURGER */
+    .hamburger { display: none; flex-direction: column; justify-content: center; align-items: center; gap: 5px; width: 44px; height: 44px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: border-color 0.2s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    .hamburger:hover { border-color: rgba(200,245,66,0.3); }
+    .hamburger span { display: block; width: 18px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.3s ease; pointer-events: none; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* OVERLAY — z-index 100, below sidebar */
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+    .sidebar-overlay.show { opacity: 1; pointer-events: auto; }
+
     .main { padding: 32px; display: flex; flex-direction: column; gap: 24px; overflow-y: auto; }
     @keyframes fadeUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; animation: fadeUp 0.5s ease both; }
@@ -53,7 +87,6 @@
     .card-title { font-family: var(--font-display); font-size: 20px; letter-spacing: 1px; }
     .card-badge { font-family: var(--font-mono); font-size: 11px; color: var(--muted); background: var(--card2); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); }
 
-    /* SUMMARY CARDS */
     .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
     .summary-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; animation: fadeUp 0.5s ease both; transition: border-color 0.2s, transform 0.2s; }
     .summary-card:hover { border-color: rgba(200,245,66,0.2); transform: translateY(-2px); }
@@ -64,7 +97,6 @@
     .summary-value { font-family: var(--font-display); font-size: 40px; letter-spacing: 1px; line-height: 1; margin-bottom: 4px; color: var(--accent); }
     .summary-label { font-size: 12px; color: var(--muted2); font-weight: 500; }
 
-    /* CHART */
     .chart-wrap { height: 180px; display: flex; align-items: flex-end; gap: 6px; }
     .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
     .bar { width: 100%; border-radius: 6px 6px 0 0; background: rgba(200,245,66,0.15); border: 1px solid rgba(200,245,66,0.2); transition: background 0.2s; cursor: pointer; animation: growBar 0.8s ease both; position: relative; }
@@ -75,27 +107,23 @@
     @keyframes growBar { from { transform: scaleY(0); transform-origin: bottom; } to { transform: scaleY(1); transform-origin: bottom; } }
     .bar-lbl { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
 
-    /* HISTORY TABLE */
     .history-table { width: 100%; border-collapse: collapse; }
     .history-table th { font-family: var(--font-mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; padding: 0 16px 12px; text-align: left; border-bottom: 1px solid var(--border); }
     .history-table td { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 14px; }
     .history-table tr:last-child td { border-bottom: none; }
     .history-table tr { transition: background 0.15s; }
     .history-table tr:hover td { background: rgba(255,255,255,0.02); }
-
     .pts-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-family: var(--font-mono); font-size: 12px; font-weight: 500; }
     .pts-badge.positive { background: rgba(200,245,66,0.1); color: var(--accent); border: 1px solid rgba(200,245,66,0.2); }
-
     .source-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--card2); border: 1px solid var(--border); border-radius: 6px; font-size: 12px; color: var(--muted2); }
-
     .empty-state { text-align: center; padding: 48px; color: var(--muted2); }
     .empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; }
     .empty-state p { font-size: 14px; }
 
-    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 14px; z-index: 200; transform: translateY(80px); opacity: 0; transition: all 0.3s ease; }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 14px; z-index: 9999; transform: translateY(80px); opacity: 0; transition: all 0.3s ease; pointer-events: none; }
     .toast.show { transform: translateY(0); opacity: 1; }
 
-    .loading-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; transition: opacity 0.5s, visibility 0.5s; }
+    .loading-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999; transition: opacity 0.5s, visibility 0.5s; }
     .loading-overlay.hidden { opacity: 0; visibility: hidden; }
     .loading-logo { font-family: var(--font-display); font-size: 64px; letter-spacing: 8px; color: var(--accent); animation: flicker 1.5s ease infinite; }
     @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
@@ -103,33 +131,13 @@
     .loading-bar { height: 100%; background: var(--accent); border-radius: 2px; animation: loadBar 1.5s ease forwards; }
     @keyframes loadBar { from { width: 0; } to { width: 100%; } }
 
-   .hamburger {
-  display: none;
-  flex-direction: column; justify-content: center; align-items: center;
-  gap: 5px; width: 40px; height: 40px;
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 8px; cursor: pointer;
-  transition: border-color 0.2s;
-}
-.hamburger:hover { border-color: rgba(200,245,66,0.3); }
-.hamburger span { display: block; width: 18px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.3s ease; }
-.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.hamburger.open span:nth-child(2) { opacity: 0; }
-.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 49; opacity: 0; transition: opacity 0.3s ease; }
-.sidebar-overlay.show { opacity: 1; }
-
-@media (max-width: 768px) {
-  .app { grid-template-columns: 1fr; }
-  .sidebar { display: flex; position: fixed; left: 0; top: 0; height: 100vh; width: 260px; transform: translateX(-100%); transition: transform 0.3s ease; z-index: 50; }
-  .sidebar.open { transform: translateX(0); }
-  .sidebar-overlay { display: block; }
-  .hamburger { display: flex; }
-  .topbar { padding: 0 16px; }
-  .main { padding: 16px; }
-  .summary-grid { grid-template-columns: 1fr; }
-  .tasks-grid { grid-template-columns: 1fr; }
-}
+    @media (max-width: 768px) {
+      .sidebar-overlay { display: block; }
+      .hamburger { display: flex; }
+      .topbar { padding: 0 16px; height: 56px; }
+      .main { padding: 16px; }
+      .summary-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -142,51 +150,50 @@
 <div class="bg-grid"></div>
 <div class="bg-glow"></div>
 <div class="toast" id="toast"></div>
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- Sidebar is OUTSIDE .app — no stacking context trap -->
+<aside class="sidebar" id="sidebar">
+  <div class="logo">
+    <div class="logo-text">FUKURO</div>
+    <div class="logo-sub">Ecosystem Dashboard</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-label">Main</div>
+    <a class="nav-item" href="dashboard.html"><span class="icon">⚡</span> Dashboard</a>
+    <a class="nav-item" href="leaderboard.html"><span class="icon">🏆</span> Leaderboard <span class="badge">LIVE</span></a>
+    <a class="nav-item" href="dashboard.html#wallet"><span class="icon">💼</span> Wallet</a>
+    <div class="nav-label">Activity</div>
+    <a class="nav-item" href="tasks.html"><span class="icon">✅</span> Tasks</a>
+    <a class="nav-item active" href="points-history.html"><span class="icon">📈</span> Points History</a>
+    <div class="nav-label">Account</div>
+    <a class="nav-item" href="profile.html"><span class="icon">👤</span> Profile</a>
+    <a class="nav-item" href="settings.html"><span class="icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="user-chip">
+      <div class="avatar" id="sidebarAvatar">?</div>
+      <div class="user-info">
+        <div class="user-name" id="sidebarName">Loading...</div>
+        <div class="user-email" id="sidebarEmail">—</div>
+      </div>
+      <button class="logout-btn" id="logoutBtn" title="Logout">⏻</button>
+    </div>
+  </div>
+</aside>
 
 <div class="app">
-  <aside class="sidebar" id="sidebar">
-    <div class="logo">
-      <div class="logo-text">FUKURO</div>
-      <div class="logo-sub">Ecosystem Dashboard</div>
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="hamburger" id="hamburger" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="page-title">POINTS HISTORY</div>
     </div>
-    <nav class="nav">
-      <div class="nav-label">Main</div>
-      <a class="nav-item" href="dashboard.html"><span class="icon">⚡</span> Dashboard</a>
-      <a class="nav-item" href="leaderboard.html"><span class="icon">🏆</span> Leaderboard <span class="badge">LIVE</span></a>
-      <a class="nav-item" href="dashboard.html#wallet"><span class="icon">💼</span> Wallet</a>
-      <div class="nav-label">Activity</div>
-      <a class="nav-item" href="tasks.html"><span class="icon">✅</span> Tasks</a>
-      <a class="nav-item active" href="points-history.html"><span class="icon">📈</span> Points History</a>
-      <div class="nav-label">Account</div>
-      <a class="nav-item" href="profile.html"><span class="icon">👤</span> Profile</a>
-      <a class="nav-item" href="settings.html"><span class="icon">⚙️</span> Settings</a>
-    </nav>
-    <div class="sidebar-bottom">
-      <div class="user-chip">
-        <div class="avatar" id="sidebarAvatar">?</div>
-        <div class="user-info">
-          <div class="user-name" id="sidebarName">Loading...</div>
-          <div class="user-email" id="sidebarEmail">—</div>
-        </div>
-        <button class="logout-btn" onclick="logout()" title="Logout">⏻</button>
-      </div>
-    </div>
-  </aside>
-
- <header class="topbar">
-  <div style="display:flex;align-items:center;gap:12px;">
-    <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
-      <span></span><span></span><span></span>
-    </button>
-    <div class="page-title">POINTS HISTORY</div>
-  </div>
-  <div class="status-dot"><div class="dot"></div><span>LIVE</span></div>
-</header>
+    <div class="status-dot"><div class="dot"></div><span>LIVE</span></div>
+  </header>
 
   <main class="main">
-
-    <!-- SUMMARY -->
     <div class="summary-grid">
       <div class="summary-card">
         <div class="summary-icon">⚡</div>
@@ -205,7 +212,6 @@
       </div>
     </div>
 
-    <!-- CHART -->
     <div class="card" style="animation-delay:0.4s">
       <div class="card-header">
         <div class="card-title">30-DAY ACTIVITY</div>
@@ -214,7 +220,6 @@
       <div class="chart-wrap" id="chart"></div>
     </div>
 
-    <!-- HISTORY TABLE -->
     <div class="card" style="animation-delay:0.5s">
       <div class="card-header">
         <div class="card-title">ACTIVITY LOG</div>
@@ -222,13 +227,31 @@
       </div>
       <div id="historyContent"></div>
     </div>
-
   </main>
 </div>
 
 <script>
   const API = "https://zestful-wisdom-production-c5b7.up.railway.app/api";
   const token = localStorage.getItem("token");
+
+  // ── Sidebar ──────────────────────────────────────────────────
+  (function() {
+    var s = document.getElementById('sidebar');
+    var o = document.getElementById('sidebarOverlay');
+    var h = document.getElementById('hamburger');
+    var lb = document.getElementById('logoutBtn');
+    function open()  { s.classList.add('open');    o.classList.add('show');    h.classList.add('open');    document.body.style.overflow = 'hidden'; }
+    function close() { s.classList.remove('open'); o.classList.remove('show'); h.classList.remove('open'); document.body.style.overflow = ''; }
+    window.toggleSidebar = function() { s.classList.contains('open') ? close() : open(); };
+    window.closeSidebar  = close;
+    h.addEventListener('click', function(e) { e.stopPropagation(); window.toggleSidebar(); });
+    o.addEventListener('click', close);
+    if (lb) lb.addEventListener('click', function() { logout(); });
+    document.querySelectorAll('.nav-item').forEach(function(a) { a.addEventListener('click', function() { if (window.innerWidth <= 768) close(); }); });
+    var tx = 0, ty = 0;
+    s.addEventListener('touchstart', function(e) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+    s.addEventListener('touchend', function(e) { var dx = tx - e.changedTouches[0].clientX, dy = Math.abs(ty - e.changedTouches[0].clientY); if (dx > 60 && dx > dy) close(); }, { passive: true });
+  })();
 
   const SOURCE_MAP = {
     loginToday:      { label: "Daily Login",       icon: "🔐" },
@@ -243,30 +266,18 @@
   window.onload = async () => {
     setTimeout(() => document.getElementById("loader").classList.add("hidden"), 1500);
     if (!token) { window.location.href = "login.html"; return; }
-
     try {
-      // Load profile
-      const pRes = await fetch(`${API}/protected/profile`, {
-        headers: { "Authorization": "Bearer " + token }
-      });
+      const pRes = await fetch(`${API}/protected/profile`, { headers: { "Authorization": "Bearer " + token } });
       if (!pRes.ok) { logout(); return; }
       const { user } = await pRes.json();
-
       document.getElementById("sidebarAvatar").textContent = user.username[0].toUpperCase();
       document.getElementById("sidebarName").textContent = user.username;
       document.getElementById("sidebarEmail").textContent = user.email;
-
-      // Load weekly (we'll use full pointsHistory from profile)
       const history = user.pointsHistory || [];
-
       renderSummary(user.points, history);
       renderChart(history);
       renderTable(history);
-
-    } catch (err) {
-      console.error(err);
-      showToast("Failed to load history ❌", "error");
-    }
+    } catch (err) { console.error(err); showToast("Failed to load history ❌", "error"); }
   };
 
   function renderSummary(totalPoints, history) {
@@ -280,33 +291,21 @@
   function renderChart(history) {
     const chart = document.getElementById("chart");
     chart.innerHTML = "";
-
-    // Build last 30 days
     const days = [];
     for (let i = 29; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
+      const d = new Date(); d.setDate(d.getDate() - i);
       const dateStr = d.toISOString().split("T")[0];
       const entry = history.find(h => h.date === dateStr);
       days.push({ date: dateStr, points: entry ? entry.points : 0 });
     }
-
     const max = Math.max(...days.map(d => d.points)) || 1;
-
     days.forEach((day, i) => {
       const d = new Date(day.date + "T00:00:00");
       const label = d.getDate();
       const isToday = day.date === new Date().toISOString().split("T")[0];
-
       const col = document.createElement("div");
       col.className = "bar-col";
-      col.innerHTML = `
-        <div class="bar ${isToday ? "highlight" : ""}"
-          style="height:${Math.max((day.points / max) * 100, day.points > 0 ? 5 : 2)}%; animation-delay:${i * 0.02}s">
-          <div class="bar-tooltip">${day.points} pts</div>
-        </div>
-        <div class="bar-lbl">${i % 5 === 0 ? label : ""}</div>
-      `;
+      col.innerHTML = `<div class="bar ${isToday ? "highlight" : ""}" style="height:${Math.max((day.points/max)*100, day.points>0?5:2)}%;animation-delay:${i*0.02}s"><div class="bar-tooltip">${day.points} pts</div></div><div class="bar-lbl">${i % 5 === 0 ? label : ""}</div>`;
       chart.appendChild(col);
     });
   }
@@ -314,86 +313,26 @@
   function renderTable(history) {
     const content = document.getElementById("historyContent");
     document.getElementById("entryCount").textContent = `${history.length} entries`;
-
-    if (!history.length) {
-      content.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">📭</div>
-          <p>No points history yet. Start completing tasks to earn points!</p>
-        </div>`;
-      return;
-    }
-
-    // Sort newest first
+    if (!history.length) { content.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>No points history yet. Start completing tasks to earn points!</p></div>`; return; }
     const sorted = [...history].sort((a, b) => new Date(b.date) - new Date(a.date));
-
     const table = document.createElement("table");
     table.className = "history-table";
-    table.innerHTML = `
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Source</th>
-          <th>Points</th>
-          <th>Day Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${sorted.map(entry => {
-          const src = SOURCE_MAP.default;
-          const date = new Date(entry.date + "T00:00:00");
-          const dateLabel = date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
-          const isToday = entry.date === new Date().toISOString().split("T")[0];
-
-          return `
-            <tr>
-              <td>
-                <div style="font-weight:600">${dateLabel}</div>
-                <div style="font-size:11px;color:var(--muted);font-family:var(--font-mono)">${entry.date} ${isToday ? '<span style="color:var(--accent)">• TODAY</span>' : ""}</div>
-              </td>
-              <td>
-                <span class="source-badge">${src.icon} ${src.label}</span>
-              </td>
-              <td>
-                <span class="pts-badge positive">+${entry.points}</span>
-              </td>
-              <td style="font-family:var(--font-mono);font-size:13px;color:var(--accent)">
-                ${entry.points} pts
-              </td>
-            </tr>
-          `;
-        }).join("")}
-      </tbody>
-    `;
+    table.innerHTML = `<thead><tr><th>Date</th><th>Source</th><th>Points</th><th>Day Total</th></tr></thead><tbody>${sorted.map(entry => {
+      const src = SOURCE_MAP.default;
+      const date = new Date(entry.date + "T00:00:00");
+      const dateLabel = date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+      const isToday = entry.date === new Date().toISOString().split("T")[0];
+      return `<tr><td><div style="font-weight:600">${dateLabel}</div><div style="font-size:11px;color:var(--muted);font-family:var(--font-mono)">${entry.date} ${isToday ? '<span style="color:var(--accent)">• TODAY</span>' : ""}</div></td><td><span class="source-badge">${src.icon} ${src.label}</span></td><td><span class="pts-badge positive">+${entry.points}</span></td><td style="font-family:var(--font-mono);font-size:13px;color:var(--accent)">${entry.points} pts</td></tr>`;
+    }).join("")}</tbody>`;
     content.appendChild(table);
   }
 
-  function logout() {
-    localStorage.removeItem("token");
-    window.location.href = "login.html";
-  }
-
+  function logout() { localStorage.removeItem("token"); window.location.href = "login.html"; }
   function showToast(msg, type = "") {
     const t = document.getElementById("toast");
-    t.textContent = msg;
-    t.className = `toast ${type} show`;
+    t.textContent = msg; t.className = `toast ${type} show`;
     setTimeout(() => t.classList.remove("show"), 2500);
   }
-  function toggleSidebar() {
-  document.getElementById("sidebar").classList.toggle("open");
-  document.getElementById("sidebarOverlay").classList.toggle("show");
-  document.getElementById("hamburger").classList.toggle("open");
-}
-function closeSidebar() {
-  document.getElementById("sidebar").classList.remove("open");
-  document.getElementById("sidebarOverlay").classList.remove("show");
-  document.getElementById("hamburger").classList.remove("open");
-}
-document.querySelectorAll(".nav-item").forEach(item => {
-  item.addEventListener("click", () => {
-    if (window.innerWidth <= 768) closeSidebar();
-  });
-});
 </script>
 </body>
 </html>

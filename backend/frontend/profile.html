@@ -18,16 +18,32 @@
     .bg-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(200,245,66,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(200,245,66,0.03) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; z-index: 0; }
     .bg-glow { position: fixed; top: -300px; left: 50%; transform: translateX(-50%); width: 900px; height: 600px; background: radial-gradient(ellipse, rgba(200,245,66,0.06) 0%, transparent 65%); pointer-events: none; z-index: 0; }
 
-    .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; position: relative; z-index: 1; }
+    /* .app — NO z-index, NO position:relative */
+    .app { display: grid; grid-template-columns: 1fr; min-height: 100vh; }
 
-    /* SIDEBAR */
-    .sidebar { grid-row: 1 / -1; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 32px 0; position: sticky; top: 0; height: 100vh; }
+    /* SIDEBAR — always fixed, direct body child */
+    .sidebar {
+      position: fixed !important; top: 0; left: 0;
+      width: 240px; height: 100%; height: 100dvh;
+      background: var(--surface); border-right: 1px solid var(--border);
+      display: flex !important; flex-direction: column; padding: 32px 0;
+      overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+      z-index: 200 !important;
+      transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    .sidebar.open { transform: translateX(0) !important; box-shadow: 8px 0 32px rgba(0,0,0,0.6); }
+
+    @media (min-width: 769px) {
+      .sidebar { transform: translateX(0) !important; box-shadow: none !important; }
+      .app { margin-left: 240px; }
+    }
+
     .logo { padding: 0 24px 32px; border-bottom: 1px solid var(--border); }
     .logo-text { font-family: var(--font-display); font-size: 36px; letter-spacing: 4px; color: var(--accent); line-height: 1; }
     .logo-sub { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
     .nav { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
     .nav-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; padding: 0 8px; margin: 12px 0 6px; }
-    .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; color: var(--muted2); font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; border: 1px solid transparent; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; color: var(--muted2); font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; border: 1px solid transparent; -webkit-tap-highlight-color: transparent; }
     .nav-item:hover { color: var(--text); background: var(--card); }
     .nav-item.active { color: var(--accent); background: rgba(200,245,66,0.08); border-color: rgba(200,245,66,0.15); }
     .nav-item .icon { width: 18px; text-align: center; font-size: 16px; }
@@ -39,30 +55,27 @@
     .user-info { flex: 1; min-width: 0; }
     .user-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .user-email { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .logout-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; transition: color 0.2s; }
+    .logout-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; transition: color 0.2s; -webkit-tap-highlight-color: transparent; }
     .logout-btn:hover { color: #fa6d6d; }
 
-    /* MOBILE TOPBAR */
-    .mobile-topbar { display: none; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 16px; height: 60px; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 48; }
+    /* MOBILE TOPBAR — z-index 150 */
+    .mobile-topbar { display: none; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 16px; height: 60px; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 150; }
     .mobile-logo { font-family: var(--font-display); font-size: 28px; letter-spacing: 4px; color: var(--accent); }
 
     /* HAMBURGER */
-    .hamburger { display: none; flex-direction: column; justify-content: center; align-items: center; gap: 5px; width: 40px; height: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: border-color 0.2s; }
+    .hamburger { display: none; flex-direction: column; justify-content: center; align-items: center; gap: 5px; width: 44px; height: 44px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: border-color 0.2s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     .hamburger:hover { border-color: rgba(200,245,66,0.3); }
-    .hamburger span { display: block; width: 18px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.3s ease; }
+    .hamburger span { display: block; width: 18px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.3s ease; pointer-events: none; }
     .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     .hamburger.open span:nth-child(2) { opacity: 0; }
     .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-    /* SIDEBAR OVERLAY */
-    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 49; opacity: 0; transition: opacity 0.3s ease; }
-    .sidebar-overlay.show { opacity: 1; }
+    /* OVERLAY — z-index 100, below sidebar */
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+    .sidebar-overlay.show { opacity: 1; pointer-events: auto; }
 
-    /* CONTENT */
     .content { padding: 32px; overflow-y: auto; }
     .page-title { font-family: var(--font-display); font-size: 40px; letter-spacing: 3px; margin-bottom: 32px; }
-
-    /* PROFILE */
     .profile-grid { display: grid; grid-template-columns: 320px 1fr; gap: 24px; }
     .profile-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 32px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
     .avatar-wrap { position: relative; cursor: pointer; }
@@ -80,7 +93,7 @@
     .wallet-display { width: 100%; background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 8px; margin-top: 4px; }
     .wallet-addr { font-family: var(--font-mono); font-size: 11px; color: var(--accent2); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .wallet-none { color: var(--muted); font-size: 12px; }
-    .copy-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; transition: color 0.2s; }
+    .copy-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; transition: color 0.2s; -webkit-tap-highlight-color: transparent; }
     .copy-btn:hover { color: var(--accent); }
     .forms-col { display: flex; flex-direction: column; gap: 20px; }
     .form-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
@@ -90,20 +103,16 @@
     .form-input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; color: var(--text); font-family: var(--font-body); font-size: 14px; outline: none; transition: border-color 0.2s; }
     .form-input:focus { border-color: var(--accent); }
     .form-input::placeholder { color: var(--muted); }
-    .btn { padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-family: var(--font-body); font-weight: 600; font-size: 14px; transition: all 0.2s; width: 100%; }
+    .btn { padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-family: var(--font-body); font-weight: 600; font-size: 14px; transition: all 0.2s; width: 100%; -webkit-tap-highlight-color: transparent; }
     .btn-accent { background: var(--accent); color: #000; }
     .btn-accent:hover { background: #d4ff44; transform: translateY(-1px); }
     .btn-danger { background: rgba(245,66,66,0.12); color: #fa6d6d; border: 1px solid rgba(245,66,66,0.25); }
     .btn-danger:hover { background: rgba(245,66,66,0.2); }
-
-    /* TOAST */
-    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 14px; z-index: 200; transform: translateY(80px); opacity: 0; transition: all 0.3s ease; max-width: calc(100vw - 32px); }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 14px; z-index: 9999; transform: translateY(80px); opacity: 0; transition: all 0.3s ease; max-width: calc(100vw - 32px); pointer-events: none; }
     .toast.show { transform: translateY(0); opacity: 1; }
     .toast.success { border-color: rgba(200,245,66,0.3); }
     .toast.error { border-color: rgba(250,109,109,0.3); }
-
-    /* LOADING */
-    .loading-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; transition: opacity 0.5s, visibility 0.5s; }
+    .loading-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999; transition: opacity 0.5s, visibility 0.5s; }
     .loading-overlay.hidden { opacity: 0; visibility: hidden; }
     .loading-logo { font-family: var(--font-display); font-size: 64px; letter-spacing: 8px; color: var(--accent); animation: flicker 1.5s ease infinite; }
     @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
@@ -111,22 +120,8 @@
     .loading-bar { height: 100%; background: var(--accent); border-radius: 2px; animation: loadBar 1.5s ease forwards; }
     @keyframes loadBar { from { width: 0; } to { width: 100%; } }
 
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 1000px) {
-      .profile-grid { grid-template-columns: 1fr; }
-    }
-
+    @media (max-width: 1000px) { .profile-grid { grid-template-columns: 1fr; } }
     @media (max-width: 768px) {
-      .app { grid-template-columns: 1fr; }
-      .sidebar {
-        display: flex;
-        position: fixed; left: 0; top: 0;
-        height: 100vh; width: 260px;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-        z-index: 50;
-      }
-      .sidebar.open { transform: translateX(0); }
       .sidebar-overlay { display: block; }
       .hamburger { display: flex; }
       .mobile-topbar { display: flex; }
@@ -137,7 +132,6 @@
       .profile-username { font-size: 22px; }
       .form-card { padding: 16px; }
     }
-
     @media (max-width: 480px) {
       .stat-mini-val { font-size: 18px; }
       .stat-mini-label { font-size: 9px; letter-spacing: 0; }
@@ -150,121 +144,91 @@
   <div class="loading-logo">FUKURO</div>
   <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
 </div>
-
 <div class="bg-grid"></div>
 <div class="bg-glow"></div>
 <div class="toast" id="toast"></div>
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-<!-- MOBILE TOPBAR -->
+<!-- Mobile topbar outside .app -->
 <div class="mobile-topbar">
   <div class="mobile-logo">FUKURO</div>
-  <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+  <button class="hamburger" id="hamburger" aria-label="Open menu">
     <span></span><span></span><span></span>
   </button>
 </div>
 
-<div class="app">
-  <aside class="sidebar" id="sidebar">
-    <div class="logo">
-      <div class="logo-text">FUKURO</div>
-      <div class="logo-sub">Ecosystem Dashboard</div>
-    </div>
-    <nav class="nav">
-      <div class="nav-label">Main</div>
-      <a class="nav-item" href="dashboard.html" onclick="closeSidebar()"><span class="icon">⚡</span> Dashboard</a>
-      <a class="nav-item" href="leaderboard.html" onclick="closeSidebar()"><span class="icon">🏆</span> Leaderboard <span class="badge">LIVE</span></a>
-      <a class="nav-item" href="dashboard.html#wallet" onclick="closeSidebar()"><span class="icon">💼</span> Wallet</a>
-      <div class="nav-label">Activity</div>
-      <a class="nav-item" href="tasks.html" onclick="closeSidebar()"><span class="icon">✅</span> Tasks</a>
-      <a class="nav-item" href="points-history.html" onclick="closeSidebar()"><span class="icon">📈</span> Points History</a>
-      <div class="nav-label">Account</div>
-      <a class="nav-item active" href="profile.html" onclick="closeSidebar()"><span class="icon">👤</span> Profile</a>
-      <a class="nav-item" href="settings.html" onclick="closeSidebar()"><span class="icon">⚙️</span> Settings</a>
-    </nav>
-    <div class="sidebar-bottom">
-      <div class="user-chip">
-        <div class="avatar-sm" id="sidebarAvatar">?</div>
-        <div class="user-info">
-          <div class="user-name" id="sidebarName">Loading...</div>
-          <div class="user-email" id="sidebarEmail">—</div>
-        </div>
-        <button class="logout-btn" onclick="logout()" title="Logout">⏻</button>
+<!-- Sidebar outside .app -->
+<aside class="sidebar" id="sidebar">
+  <div class="logo">
+    <div class="logo-text">FUKURO</div>
+    <div class="logo-sub">Ecosystem Dashboard</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-label">Main</div>
+    <a class="nav-item" href="dashboard.html"><span class="icon">⚡</span> Dashboard</a>
+    <a class="nav-item" href="leaderboard.html"><span class="icon">🏆</span> Leaderboard <span class="badge">LIVE</span></a>
+    <a class="nav-item" href="dashboard.html#wallet"><span class="icon">💼</span> Wallet</a>
+    <div class="nav-label">Activity</div>
+    <a class="nav-item" href="tasks.html"><span class="icon">✅</span> Tasks</a>
+    <a class="nav-item" href="points-history.html"><span class="icon">📈</span> Points History</a>
+    <div class="nav-label">Account</div>
+    <a class="nav-item active" href="profile.html"><span class="icon">👤</span> Profile</a>
+    <a class="nav-item" href="settings.html"><span class="icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="user-chip">
+      <div class="avatar-sm" id="sidebarAvatar">?</div>
+      <div class="user-info">
+        <div class="user-name" id="sidebarName">Loading...</div>
+        <div class="user-email" id="sidebarEmail">—</div>
       </div>
+      <button class="logout-btn" id="logoutBtn" title="Logout">⏻</button>
     </div>
-  </aside>
+  </div>
+</aside>
 
+<div class="app">
   <div class="content">
     <div class="page-title">PROFILE</div>
     <div class="profile-grid">
-
-      <!-- LEFT -->
       <div style="display:flex;flex-direction:column;gap:16px;">
         <div class="profile-card">
-          <div class="avatar-wrap" onclick="document.getElementById('avatarInput').click()">
+          <div class="avatar-wrap" id="avatarWrap">
             <div class="avatar-lg" id="avatarLg">?</div>
             <div class="avatar-overlay">📷</div>
           </div>
-          <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatar(event)">
+          <input type="file" id="avatarInput" accept="image/*">
           <div class="profile-username" id="profileUsername">—</div>
           <div class="profile-email" id="profileEmail">—</div>
           <div class="stats-mini">
-            <div class="stat-mini">
-              <div class="stat-mini-val" id="statPoints">0</div>
-              <div class="stat-mini-label">Points</div>
-            </div>
-            <div class="stat-mini">
-              <div class="stat-mini-val" id="statRank">#—</div>
-              <div class="stat-mini-label">Rank</div>
-            </div>
-            <div class="stat-mini">
-              <div class="stat-mini-val" id="statStreak">0</div>
-              <div class="stat-mini-label">Streak</div>
-            </div>
+            <div class="stat-mini"><div class="stat-mini-val" id="statPoints">0</div><div class="stat-mini-label">Points</div></div>
+            <div class="stat-mini"><div class="stat-mini-val" id="statRank">#—</div><div class="stat-mini-label">Rank</div></div>
+            <div class="stat-mini"><div class="stat-mini-val" id="statStreak">0</div><div class="stat-mini-label">Streak</div></div>
           </div>
           <div class="wallet-display">
             <span>💼</span>
             <span class="wallet-addr" id="walletAddr"><span class="wallet-none">No wallet connected</span></span>
-            <button class="copy-btn" onclick="copyWallet()">⎘</button>
+            <button class="copy-btn" id="copyWalletBtn">⎘</button>
           </div>
         </div>
       </div>
-
-      <!-- RIGHT -->
       <div class="forms-col">
         <div class="form-card">
           <div class="form-card-title">✏️ Edit Profile</div>
-          <div class="form-group">
-            <label>Username</label>
-            <input class="form-input" id="inputUsername" placeholder="Enter username" />
-          </div>
-          <div class="form-group">
-            <label>Email</label>
-            <input class="form-input" id="inputEmail" type="email" placeholder="Enter email" />
-          </div>
-          <button class="btn btn-accent" onclick="updateProfile()">Save Changes</button>
+          <div class="form-group"><label>Username</label><input class="form-input" id="inputUsername" placeholder="Enter username" /></div>
+          <div class="form-group"><label>Email</label><input class="form-input" id="inputEmail" type="email" placeholder="Enter email" /></div>
+          <button class="btn btn-accent" id="saveProfileBtn">Save Changes</button>
         </div>
-
         <div class="form-card">
           <div class="form-card-title">🔒 Change Password</div>
-          <div class="form-group">
-            <label>Current Password</label>
-            <input class="form-input" id="currentPassword" type="password" placeholder="Enter current password" />
-          </div>
-          <div class="form-group">
-            <label>New Password</label>
-            <input class="form-input" id="newPassword" type="password" placeholder="Enter new password" />
-          </div>
-          <div class="form-group">
-            <label>Confirm New Password</label>
-            <input class="form-input" id="confirmPassword" type="password" placeholder="Confirm new password" />
-          </div>
-          <button class="btn btn-accent" onclick="changePassword()">Update Password</button>
+          <div class="form-group"><label>Current Password</label><input class="form-input" id="currentPassword" type="password" placeholder="Enter current password" /></div>
+          <div class="form-group"><label>New Password</label><input class="form-input" id="newPassword" type="password" placeholder="Enter new password" /></div>
+          <div class="form-group"><label>Confirm New Password</label><input class="form-input" id="confirmPassword" type="password" placeholder="Confirm new password" /></div>
+          <button class="btn btn-accent" id="changePasswordBtn">Update Password</button>
         </div>
-
         <div class="form-card">
           <div class="form-card-title">⚠️ Danger Zone</div>
-          <button class="btn btn-danger" onclick="confirmLogout()">Logout of all devices</button>
+          <button class="btn btn-danger" id="logoutAllBtn">Logout of all devices</button>
         </div>
       </div>
     </div>
@@ -276,28 +240,35 @@
   const token = localStorage.getItem("token");
   let currentUser = null;
 
-  function toggleSidebar() {
-    const sidebar = document.getElementById("sidebar");
-    const overlay = document.getElementById("sidebarOverlay");
-    const hamburger = document.getElementById("hamburger");
-    sidebar.classList.toggle("open");
-    overlay.classList.toggle("show");
-    hamburger.classList.toggle("open");
-  }
-
-  function closeSidebar() {
-    document.getElementById("sidebar").classList.remove("open");
-    document.getElementById("sidebarOverlay").classList.remove("show");
-    document.getElementById("hamburger").classList.remove("open");
-  }
+  // ── Sidebar ──────────────────────────────────────────────────
+  (function() {
+    var s = document.getElementById('sidebar');
+    var o = document.getElementById('sidebarOverlay');
+    var h = document.getElementById('hamburger');
+    function open()  { s.classList.add('open');    o.classList.add('show');    h.classList.add('open');    document.body.style.overflow = 'hidden'; }
+    function close() { s.classList.remove('open'); o.classList.remove('show'); h.classList.remove('open'); document.body.style.overflow = ''; }
+    window.toggleSidebar = function() { s.classList.contains('open') ? close() : open(); };
+    window.closeSidebar  = close;
+    h.addEventListener('click', function(e) { e.stopPropagation(); window.toggleSidebar(); });
+    o.addEventListener('click', close);
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+    document.getElementById('saveProfileBtn').addEventListener('click', updateProfile);
+    document.getElementById('changePasswordBtn').addEventListener('click', changePassword);
+    document.getElementById('copyWalletBtn').addEventListener('click', copyWallet);
+    document.getElementById('logoutAllBtn').addEventListener('click', function() { if (confirm("Are you sure you want to logout?")) logout(); });
+    document.getElementById('avatarWrap').addEventListener('click', function() { document.getElementById('avatarInput').click(); });
+    document.getElementById('avatarInput').addEventListener('change', handleAvatar);
+    document.querySelectorAll('.nav-item').forEach(function(a) { a.addEventListener('click', function() { if (window.innerWidth <= 768) close(); }); });
+    var tx = 0, ty = 0;
+    s.addEventListener('touchstart', function(e) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+    s.addEventListener('touchend', function(e) { var dx = tx - e.changedTouches[0].clientX, dy = Math.abs(ty - e.changedTouches[0].clientY); if (dx > 60 && dx > dy) close(); }, { passive: true });
+  })();
 
   window.onload = async () => {
     setTimeout(() => document.getElementById("loader").classList.add("hidden"), 1500);
     if (!token) { window.location.href = "login.html"; return; }
     try {
-      const res = await fetch(`${API}/protected/profile`, {
-        headers: { "Authorization": "Bearer " + token }
-      });
+      const res = await fetch(`${API}/protected/profile`, { headers: { "Authorization": "Bearer " + token } });
       if (!res.ok) { logout(); return; }
       const { user } = await res.json();
       currentUser = user;
@@ -309,12 +280,8 @@
     document.getElementById("sidebarName").textContent  = user.username;
     document.getElementById("sidebarEmail").textContent = user.email;
     const savedAvatar = localStorage.getItem("avatar_" + user._id);
-    if (savedAvatar) {
-      setAvatarImage(savedAvatar);
-    } else {
-      document.getElementById("avatarLg").textContent      = user.username[0].toUpperCase();
-      document.getElementById("sidebarAvatar").textContent = user.username[0].toUpperCase();
-    }
+    if (savedAvatar) { setAvatarImage(savedAvatar); }
+    else { document.getElementById("avatarLg").textContent = user.username[0].toUpperCase(); document.getElementById("sidebarAvatar").textContent = user.username[0].toUpperCase(); }
     document.getElementById("profileUsername").textContent = user.username;
     document.getElementById("profileEmail").textContent    = user.email;
     document.getElementById("inputUsername").value         = user.username;
@@ -322,51 +289,30 @@
     document.getElementById("statPoints").textContent      = user.points?.toLocaleString() || 0;
     document.getElementById("statRank").textContent        = "#" + (user.rank || "—");
     document.getElementById("statStreak").textContent      = user.streak || 0;
-    if (user.wallet) {
-      document.getElementById("walletAddr").textContent = user.wallet;
-      document.getElementById("walletAddr").style.color = "var(--accent2)";
-    }
+    if (user.wallet) { document.getElementById("walletAddr").textContent = user.wallet; document.getElementById("walletAddr").style.color = "var(--accent2)"; }
   }
 
   function handleAvatar(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+    const file = event.target.files[0]; if (!file) return;
     const reader = new FileReader();
-    reader.onload = (e) => {
-      const base64 = e.target.result;
-      localStorage.setItem("avatar_" + currentUser._id, base64);
-      setAvatarImage(base64);
-      showToast("📷 Avatar updated!", "success");
-    };
+    reader.onload = (e) => { const base64 = e.target.result; localStorage.setItem("avatar_" + currentUser._id, base64); setAvatarImage(base64); showToast("📷 Avatar updated!", "success"); };
     reader.readAsDataURL(file);
   }
-
   function setAvatarImage(src) {
-    document.getElementById("avatarLg").innerHTML      = `<img src="${src}" alt="avatar">`;
+    document.getElementById("avatarLg").innerHTML = `<img src="${src}" alt="avatar">`;
     document.getElementById("sidebarAvatar").innerHTML = `<img src="${src}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`;
   }
-
   async function updateProfile() {
     const username = document.getElementById("inputUsername").value.trim();
     const email    = document.getElementById("inputEmail").value.trim();
     if (!username || !email) { showToast("⚠️ All fields required", "error"); return; }
     try {
-      const res = await fetch(`${API}/protected/profile`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-        body: JSON.stringify({ username, email })
-      });
+      const res = await fetch(`${API}/protected/profile`, { method: "PUT", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token }, body: JSON.stringify({ username, email }) });
       const data = await res.json();
-      if (res.ok) {
-        document.getElementById("profileUsername").textContent = username;
-        document.getElementById("profileEmail").textContent    = email;
-        document.getElementById("sidebarName").textContent     = username;
-        document.getElementById("sidebarEmail").textContent    = email;
-        showToast("✅ Profile updated!", "success");
-      } else { showToast(data.message, "error"); }
+      if (res.ok) { document.getElementById("profileUsername").textContent = username; document.getElementById("profileEmail").textContent = email; document.getElementById("sidebarName").textContent = username; document.getElementById("sidebarEmail").textContent = email; showToast("✅ Profile updated!", "success"); }
+      else { showToast(data.message, "error"); }
     } catch (err) { showToast("Network error ❌", "error"); }
   }
-
   async function changePassword() {
     const currentPassword = document.getElementById("currentPassword").value;
     const newPassword     = document.getElementById("newPassword").value;
@@ -375,44 +321,15 @@
     if (newPassword !== confirmPassword) { showToast("❌ Passwords don't match", "error"); return; }
     if (newPassword.length < 4) { showToast("❌ Password too short", "error"); return; }
     try {
-      const res = await fetch(`${API}/protected/password`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-        body: JSON.stringify({ currentPassword, newPassword })
-      });
+      const res = await fetch(`${API}/protected/password`, { method: "PUT", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token }, body: JSON.stringify({ currentPassword, newPassword }) });
       const data = await res.json();
-      if (res.ok) {
-        document.getElementById("currentPassword").value = "";
-        document.getElementById("newPassword").value     = "";
-        document.getElementById("confirmPassword").value = "";
-        showToast("🔒 Password changed!", "success");
-      } else { showToast(data.message, "error"); }
+      if (res.ok) { document.getElementById("currentPassword").value = ""; document.getElementById("newPassword").value = ""; document.getElementById("confirmPassword").value = ""; showToast("🔒 Password changed!", "success"); }
+      else { showToast(data.message, "error"); }
     } catch (err) { showToast("Network error ❌", "error"); }
   }
-
-  function copyWallet() {
-    const addr = document.getElementById("walletAddr").textContent;
-    if (addr === "No wallet connected") return;
-    navigator.clipboard.writeText(addr);
-    showToast("📋 Address copied!", "success");
-  }
-
-  function confirmLogout() {
-    if (confirm("Are you sure you want to logout?")) logout();
-  }
-
-  function logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "login.html";
-  }
-
-  function showToast(msg, type = "") {
-    const t = document.getElementById("toast");
-    t.textContent = msg;
-    t.className = `toast ${type} show`;
-    setTimeout(() => t.classList.remove("show"), 2500);
-  }
+  function copyWallet() { const addr = document.getElementById("walletAddr").textContent; if (addr === "No wallet connected") return; navigator.clipboard.writeText(addr); showToast("📋 Address copied!", "success"); }
+  function logout() { localStorage.removeItem("token"); localStorage.removeItem("user"); window.location.href = "login.html"; }
+  function showToast(msg, type = "") { const t = document.getElementById("toast"); t.textContent = msg; t.className = `toast ${type} show`; setTimeout(() => t.classList.remove("show"), 2500); }
 </script>
 </body>
 </html>
