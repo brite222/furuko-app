@@ -12,7 +12,8 @@
       --bg: #060608; --surface: #0e0e14; --card: #13131c; --card2: #181824;
       --border: rgba(255,255,255,0.07); --accent: #c8f542; --accent2: #42f5c8;
       --accent3: #f542a4; --text: #f0f0f8; --muted: #5a5a72; --muted2: #8888aa;
-      --font-display: 'Bebas Neue', sans-serif; --font-body: 'Outfit', sans-serif;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-body: 'Outfit', sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
     }
 
@@ -22,6 +23,7 @@
     .bg-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(200,245,66,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(200,245,66,0.03) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; z-index: 0; }
     .bg-glow { position: fixed; top: -300px; left: 50%; transform: translateX(-50%); width: 900px; height: 600px; background: radial-gradient(ellipse, rgba(200,245,66,0.06) 0%, transparent 65%); pointer-events: none; z-index: 0; }
 
+    /* ── LAYOUT ── */
     .app { display: grid; grid-template-columns: 240px 1fr; grid-template-rows: auto 1fr; min-height: 100vh; position: relative; z-index: 1; }
 
     /* ── SIDEBAR ── */
@@ -36,20 +38,21 @@
       top: 0;
       height: 100vh;
       z-index: 50;
-      overflow-y: auto;
     }
 
     .logo { padding: 0 24px 32px; border-bottom: 1px solid var(--border); }
     .logo-text { font-family: var(--font-display); font-size: 36px; letter-spacing: 4px; color: var(--accent); line-height: 1; }
     .logo-sub { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
-    .nav { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+
+    .nav { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
     .nav-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; padding: 0 8px; margin: 12px 0 6px; }
     .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; color: var(--muted2); font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; border: 1px solid transparent; }
     .nav-item:hover { color: var(--text); background: var(--card); }
     .nav-item.active { color: var(--accent); background: rgba(200,245,66,0.08); border-color: rgba(200,245,66,0.15); }
     .nav-item .icon { width: 18px; text-align: center; font-size: 16px; }
     .nav-item .badge { margin-left: auto; background: var(--accent3); color: #000; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; font-family: var(--font-mono); }
-    .sidebar-bottom { padding: 16px; border-top: 1px solid var(--border); margin-top: auto; }
+
+    .sidebar-bottom { padding: 16px; border-top: 1px solid var(--border); }
     .user-chip { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--card); border-radius: 10px; border: 1px solid var(--border); }
     .avatar { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #000; flex-shrink: 0; }
     .user-info { flex: 1; min-width: 0; }
@@ -74,6 +77,18 @@
     .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     .hamburger.open span:nth-child(2) { opacity: 0; }
     .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ── BACKDROP ── */
+    .backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      z-index: 998;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .backdrop.show { opacity: 1; }
 
     /* ── MAIN ── */
     .main { padding: 32px; display: flex; flex-direction: column; gap: 24px; overflow-y: auto; }
@@ -180,24 +195,10 @@
     @keyframes loadBar { from { width: 0; } to { width: 100%; } }
 
     /* ── TOAST ── */
-    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 14px; z-index: 200; transform: translateY(80px); opacity: 0; transition: all 0.3s ease; max-width: calc(100vw - 32px); }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 14px; z-index: 9999; transform: translateY(80px); opacity: 0; transition: all 0.3s ease; max-width: calc(100vw - 32px); }
     .toast.show { transform: translateY(0); opacity: 1; }
     .toast.success { border-color: rgba(200,245,66,0.3); }
     .toast.error { border-color: rgba(250,109,109,0.3); }
-
-    /* ── MOBILE DRAWER (no overlay conflict) ── */
-    .drawer-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      z-index: 98;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    .drawer-backdrop.show {
-      opacity: 1;
-    }
 
     /* ===== RESPONSIVE ===== */
     @media (max-width: 1100px) {
@@ -209,27 +210,27 @@
     @media (max-width: 768px) {
       .app { grid-template-columns: 1fr; }
 
+      /* Sidebar becomes a drawer */
       .sidebar {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 280px !important;
-        height: 100vh !important;
-        transform: translateX(-100%) !important;
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        animation: none !important;
-        z-index: 999 !important;
-        overflow-y: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-        overscroll-behavior: contain !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 280px;
+        height: 100%;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+        animation: none;
+        z-index: 999;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
       }
 
-      .sidebar.open {
-        transform: translateX(0) !important;
-        box-shadow: 4px 0 24px rgba(0,0,0,0.5) !important;
-      }
+      .sidebar.open { transform: translateX(0); box-shadow: 8px 0 32px rgba(0,0,0,0.6); }
 
-      .drawer-backdrop { display: block; z-index: 998; }
+      /* Show backdrop only on mobile */
+      .backdrop { display: block; }
+
       .hamburger { display: flex; }
       .topbar { padding: 0 16px; height: 56px; }
       .main { padding: 16px; padding-bottom: 120px; gap: 16px; }
@@ -268,11 +269,10 @@
 <div class="bg-grid"></div>
 <div class="bg-glow"></div>
 <div class="toast" id="toast"></div>
-
-<!-- Backdrop: clicking it closes the sidebar -->
-<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<div class="backdrop" id="backdrop"></div>
 
 <div class="app">
+
   <aside class="sidebar" id="sidebar">
     <div class="logo">
       <div class="logo-text">FUKURO</div>
@@ -318,6 +318,7 @@
   </header>
 
   <main class="main">
+
     <div class="stats-grid">
       <div class="stat-card green">
         <div class="stat-icon">⚡</div>
@@ -409,240 +410,273 @@
         <div class="lb-list" id="lbList"></div>
       </div>
     </div>
+
   </main>
 </div>
 
 <script>
-  // ── DRAWER (sidebar) ──────────────────────────────────────────
-  const sidebar   = document.getElementById("sidebar");
-  const backdrop  = document.getElementById("drawerBackdrop");
-  const hamburger = document.getElementById("hamburger");
+// ── Wait for DOM before touching elements ──────────────────────
+document.addEventListener("DOMContentLoaded", function() {
 
-  function toggleSidebar() {
-    const open = sidebar.classList.toggle("open");
-    hamburger.classList.toggle("open", open);
-    backdrop.classList.toggle("show", open);
-    // prevent body scroll when sidebar is open
-    document.body.style.overflow = open ? "hidden" : "";
+  var sidebarEl  = document.getElementById("sidebar");
+  var backdropEl = document.getElementById("backdrop");
+  var hamburgerEl = document.getElementById("hamburger");
+
+  function openSidebar() {
+    sidebarEl.classList.add("open");
+    backdropEl.classList.add("show");
+    hamburgerEl.classList.add("open");
+    document.body.style.overflow = "hidden";
   }
 
   function closeSidebar() {
-    sidebar.classList.remove("open");
-    hamburger.classList.remove("open");
-    backdrop.classList.remove("show");
+    sidebarEl.classList.remove("open");
+    backdropEl.classList.remove("show");
+    hamburgerEl.classList.remove("open");
     document.body.style.overflow = "";
   }
 
-  // Close on backdrop tap
-  backdrop.addEventListener("click", closeSidebar);
+  window.toggleSidebar = function() {
+    if (sidebarEl.classList.contains("open")) {
+      closeSidebar();
+    } else {
+      openSidebar();
+    }
+  };
 
-  // Close when a nav link is tapped
-  sidebar.querySelectorAll(".nav-item").forEach(link => {
-    link.addEventListener("click", () => {
+  // Close when backdrop is tapped
+  backdropEl.addEventListener("click", closeSidebar);
+
+  // Close when any nav link is tapped on mobile
+  sidebarEl.querySelectorAll("a.nav-item").forEach(function(link) {
+    link.addEventListener("click", function() {
       if (window.innerWidth <= 768) closeSidebar();
     });
   });
 
   // Swipe left to close
-  let touchStartX = 0;
-  sidebar.addEventListener("touchstart", e => { touchStartX = e.touches[0].clientX; }, { passive: true });
-  sidebar.addEventListener("touchend", e => {
-    if (touchStartX - e.changedTouches[0].clientX > 60) closeSidebar();
+  var touchStartX = 0;
+  sidebarEl.addEventListener("touchstart", function(e) {
+    touchStartX = e.touches[0].clientX;
   }, { passive: true });
 
-  // ── APP ───────────────────────────────────────────────────────
-  const API   = "https://zestful-wisdom-production-c5b7.up.railway.app/api";
-  const token = localStorage.getItem("token");
+  sidebarEl.addEventListener("touchend", function(e) {
+    var diff = touchStartX - e.changedTouches[0].clientX;
+    if (diff > 60) closeSidebar();
+  }, { passive: true });
 
-  const TASKS_CONFIG = [
-    { key: "loginToday",      text: "Login today",           pts: 10  },
-    { key: "connectWallet",   text: "Connect wallet",        pts: 50  },
-    { key: "completeProfile", text: "Complete your profile", pts: 30  },
-    { key: "referFriend",     text: "Refer a friend",        pts: 100 },
-    { key: "earn500Points",   text: "Earn 500 points",       pts: 20  },
-  ];
+});
 
-  window.onload = async () => {
-    setTimeout(() => document.getElementById("loader").classList.add("hidden"), 1500);
-    if (!token) { window.location.href = "login.html"; return; }
-    try {
-      const pRes = await fetch(`${API}/protected/profile`, { headers: { "Authorization": "Bearer " + token } });
-      if (!pRes.ok) { logout(); return; }
-      const { user } = await pRes.json();
+// ── App logic ──────────────────────────────────────────────────
+var API   = "https://zestful-wisdom-production-c5b7.up.railway.app/api";
+var token = localStorage.getItem("token");
 
-      loadUser(user);
-      renderTasks(user.tasks);
-      loadWallet(user.wallet);
+var TASKS_CONFIG = [
+  { key: "loginToday",      text: "Login today",           pts: 10  },
+  { key: "connectWallet",   text: "Connect wallet",        pts: 50  },
+  { key: "completeProfile", text: "Complete your profile", pts: 30  },
+  { key: "referFriend",     text: "Refer a friend",        pts: 100 },
+  { key: "earn500Points",   text: "Earn 500 points",       pts: 20  },
+];
 
-      const lRes = await fetch(`${API}/protected/leaderboard`, { headers: { "Authorization": "Bearer " + token } });
-      const { leaderboard } = await lRes.json();
-      renderLeaderboard(leaderboard, user.username);
+window.onload = async function() {
+  setTimeout(function() {
+    document.getElementById("loader").classList.add("hidden");
+  }, 1500);
 
-      const wRes = await fetch(`${API}/protected/weekly`, { headers: { "Authorization": "Bearer " + token } });
-      const { weekly } = await wRes.json();
-      renderChart(weekly);
+  if (!token) { window.location.href = "login.html"; return; }
 
-      const rRes = await fetch(`${API}/protected/referral`, { headers: { "Authorization": "Bearer " + token } });
-      const refData = await rRes.json();
-      document.getElementById("refCode").textContent  = refData.referralCode;
-      document.getElementById("refLink").value        = refData.referralLink;
-      document.getElementById("refCount").textContent = `${refData.referralCount} referrals`;
-      document.getElementById("refPts").textContent   = refData.pointsEarned.toLocaleString();
+  try {
+    var pRes = await fetch(API + "/protected/profile", { headers: { "Authorization": "Bearer " + token } });
+    if (!pRes.ok) { logout(); return; }
+    var pData = await pRes.json();
+    var user = pData.user;
 
-    } catch (err) {
-      console.error(err);
-      showToast("Failed to load dashboard ❌", "error");
+    loadUser(user);
+    renderTasks(user.tasks);
+    loadWallet(user.wallet);
+
+    var lRes = await fetch(API + "/protected/leaderboard", { headers: { "Authorization": "Bearer " + token } });
+    var lData = await lRes.json();
+    renderLeaderboard(lData.leaderboard, user.username);
+
+    var wRes = await fetch(API + "/protected/weekly", { headers: { "Authorization": "Bearer " + token } });
+    var wData = await wRes.json();
+    renderChart(wData.weekly);
+
+    var rRes = await fetch(API + "/protected/referral", { headers: { "Authorization": "Bearer " + token } });
+    var rData = await rRes.json();
+    document.getElementById("refCode").textContent  = rData.referralCode;
+    document.getElementById("refLink").value        = rData.referralLink;
+    document.getElementById("refCount").textContent = rData.referralCount + " referrals";
+    document.getElementById("refPts").textContent   = rData.pointsEarned.toLocaleString();
+
+  } catch(err) {
+    console.error(err);
+    showToast("Failed to load dashboard ❌", "error");
+  }
+};
+
+function loadUser(user) {
+  document.getElementById("sidebarAvatar").textContent = user.username[0].toUpperCase();
+  document.getElementById("sidebarName").textContent   = user.username;
+  document.getElementById("sidebarEmail").textContent  = user.email;
+  document.getElementById("userRank").textContent      = "#" + user.rank;
+  animateCount("totalPoints", 0, user.points, 1200);
+  animateCount("streak", 0, user.streak, 800);
+}
+
+function animateCount(id, from, to, duration) {
+  var el = document.getElementById(id);
+  var start = performance.now();
+  function update(now) {
+    var p = Math.min((now - start) / duration, 1);
+    var ease = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.floor(from + (to - from) * ease).toLocaleString();
+    if (p < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+function renderChart(weekly) {
+  var DAYS = ["M","T","W","T","F","S","S"];
+  var values = weekly.map(function(d) { return d.points; });
+  var max = Math.max.apply(null, values) || 1;
+  var chart = document.getElementById("chart");
+  chart.innerHTML = "";
+  weekly.forEach(function(day, i) {
+    var date = new Date(day.date + "T00:00:00");
+    var dayLabel = DAYS[date.getDay() === 0 ? 6 : date.getDay() - 1];
+    var wrap = document.createElement("div");
+    wrap.className = "bar-wrap";
+    wrap.innerHTML =
+      '<div class="bar ' + (day.points === max && max > 0 ? "highlight" : "") + '"' +
+      ' style="height:' + ((day.points/max)*100) + '%; animation-delay:' + (i*0.1) + 's"' +
+      ' title="' + day.points + ' pts"></div>' +
+      '<div class="bar-label">' + dayLabel + '</div>';
+    chart.appendChild(wrap);
+  });
+}
+
+function renderTasks(userTasks) {
+  var list = document.getElementById("taskList");
+  list.innerHTML = "";
+  var doneCount = 0;
+  TASKS_CONFIG.forEach(function(t) {
+    var done = userTasks && userTasks[t.key] ? true : false;
+    if (done) doneCount++;
+    var item = document.createElement("div");
+    item.className = "task-item" + (done ? " done" : "");
+    item.innerHTML =
+      '<div class="task-check">' + (done ? "✓" : "") + '</div>' +
+      '<div class="task-text">' + t.text + '</div>' +
+      '<div class="task-pts">+' + t.pts + ' pts</div>';
+    if (!done) {
+      (function(taskKey, pts) {
+        item.onclick = function() { completeTask(taskKey, pts); };
+      })(t.key, t.pts);
     }
-  };
+    list.appendChild(item);
+  });
+  document.getElementById("tasksDone").textContent    = doneCount + "/" + TASKS_CONFIG.length;
+  document.getElementById("taskProgress").textContent = doneCount + " / " + TASKS_CONFIG.length;
+}
 
-  function loadUser(user) {
-    document.getElementById("sidebarAvatar").textContent = user.username[0].toUpperCase();
-    document.getElementById("sidebarName").textContent   = user.username;
-    document.getElementById("sidebarEmail").textContent  = user.email;
-    document.getElementById("userRank").textContent      = "#" + user.rank;
-    animateCount("totalPoints", 0, user.points, 1200);
-    animateCount("streak", 0, user.streak, 800);
-  }
-
-  function animateCount(id, from, to, duration) {
-    const el = document.getElementById(id);
-    const start = performance.now();
-    const update = (now) => {
-      const p = Math.min((now - start) / duration, 1);
-      const ease = 1 - Math.pow(1 - p, 3);
-      el.textContent = Math.floor(from + (to - from) * ease).toLocaleString();
-      if (p < 1) requestAnimationFrame(update);
-    };
-    requestAnimationFrame(update);
-  }
-
-  function renderChart(weekly) {
-    const DAYS = ["M","T","W","T","F","S","S"];
-    const values = weekly.map(d => d.points);
-    const max = Math.max(...values) || 1;
-    const chart = document.getElementById("chart");
-    chart.innerHTML = "";
-    weekly.forEach((day, i) => {
-      const date = new Date(day.date + "T00:00:00");
-      const dayLabel = DAYS[date.getDay() === 0 ? 6 : date.getDay() - 1];
-      const wrap = document.createElement("div");
-      wrap.className = "bar-wrap";
-      wrap.innerHTML = `
-        <div class="bar ${day.points === max && max > 0 ? "highlight" : ""}"
-          style="height:${(day.points/max)*100}%; animation-delay:${i*0.1}s"
-          title="${day.points} pts"></div>
-        <div class="bar-label">${dayLabel}</div>`;
-      chart.appendChild(wrap);
+async function completeTask(taskKey, pts) {
+  try {
+    var res = await fetch(API + "/protected/task", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+      body: JSON.stringify({ taskKey: taskKey })
     });
+    var data = await res.json();
+    if (res.ok) {
+      showToast("✅ +" + pts + " pts earned!", "success");
+      animateCount("totalPoints", 0, data.points, 800);
+      renderTasks(data.tasks);
+    } else {
+      showToast(data.message, "error");
+    }
+  } catch(e) {
+    showToast("Network error ❌", "error");
   }
+}
 
-  function renderTasks(userTasks) {
-    const list = document.getElementById("taskList");
-    list.innerHTML = "";
-    let doneCount = 0;
-    TASKS_CONFIG.forEach(t => {
-      const done = userTasks?.[t.key] || false;
-      if (done) doneCount++;
-      const item = document.createElement("div");
-      item.className = "task-item" + (done ? " done" : "");
-      item.innerHTML = `
-        <div class="task-check">${done ? "✓" : ""}</div>
-        <div class="task-text">${t.text}</div>
-        <div class="task-pts">+${t.pts} pts</div>`;
-      if (!done) item.onclick = () => completeTask(t.key, t.pts);
-      list.appendChild(item);
+function renderLeaderboard(leaderboard, currentUsername) {
+  var list = document.getElementById("lbList");
+  list.innerHTML = "";
+  leaderboard.forEach(function(u, i) {
+    var isYou = u.username === currentUsername;
+    var item = document.createElement("div");
+    item.className = "lb-item" + (isYou ? " you" : "");
+    item.innerHTML =
+      '<div class="lb-rank">' + (i+1) + '</div>' +
+      '<div class="lb-avatar">' + u.username[0].toUpperCase() + '</div>' +
+      '<div class="lb-name">' + u.username + (isYou ? ' <span class="lb-you-tag">YOU</span>' : "") + '</div>' +
+      '<div class="lb-pts">' + u.points.toLocaleString() + '</div>';
+    list.appendChild(item);
+  });
+}
+
+function loadWallet(walletAddr) {
+  if (walletAddr) {
+    document.getElementById("walletDisplay").textContent = walletAddr;
+    document.getElementById("walletDisplay").classList.add("connected");
+    document.getElementById("walletStatus").textContent = "Connected";
+    document.getElementById("walletInput").value = walletAddr;
+  }
+}
+
+async function saveWallet() {
+  var addr = document.getElementById("walletInput").value.trim();
+  if (!addr) { showToast("⚠️ Enter a wallet address", "error"); return; }
+  try {
+    var res = await fetch(API + "/protected/wallet", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+      body: JSON.stringify({ wallet: addr })
     });
-    document.getElementById("tasksDone").textContent    = `${doneCount}/${TASKS_CONFIG.length}`;
-    document.getElementById("taskProgress").textContent = `${doneCount} / ${TASKS_CONFIG.length}`;
-  }
-
-  async function completeTask(taskKey, pts) {
-    try {
-      const res = await fetch(`${API}/protected/task`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-        body: JSON.stringify({ taskKey })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        showToast(`✅ +${pts} pts earned!`, "success");
-        animateCount("totalPoints", 0, data.points, 800);
-        renderTasks(data.tasks);
-      } else { showToast(data.message, "error"); }
-    } catch { showToast("Network error ❌", "error"); }
-  }
-
-  function renderLeaderboard(leaderboard, currentUsername) {
-    const list = document.getElementById("lbList");
-    list.innerHTML = "";
-    leaderboard.forEach((u, i) => {
-      const isYou = u.username === currentUsername;
-      const item = document.createElement("div");
-      item.className = "lb-item" + (isYou ? " you" : "");
-      item.innerHTML = `
-        <div class="lb-rank">${i + 1}</div>
-        <div class="lb-avatar">${u.username[0].toUpperCase()}</div>
-        <div class="lb-name">${u.username} ${isYou ? '<span class="lb-you-tag">YOU</span>' : ""}</div>
-        <div class="lb-pts">${u.points.toLocaleString()}</div>`;
-      list.appendChild(item);
-    });
-  }
-
-  function loadWallet(walletAddr) {
-    if (walletAddr) {
-      document.getElementById("walletDisplay").textContent = walletAddr;
+    var data = await res.json();
+    if (res.ok) {
+      document.getElementById("walletDisplay").textContent = addr;
       document.getElementById("walletDisplay").classList.add("connected");
       document.getElementById("walletStatus").textContent = "Connected";
-      document.getElementById("walletInput").value = walletAddr;
+      animateCount("totalPoints", 0, data.points, 800);
+      renderTasks(data.tasks);
+      showToast("💼 Wallet saved! +50 pts", "success");
+    } else {
+      showToast(data.message, "error");
     }
+  } catch(e) {
+    showToast("Network error ❌", "error");
   }
+}
 
-  async function saveWallet() {
-    const addr = document.getElementById("walletInput").value.trim();
-    if (!addr) { showToast("⚠️ Enter a wallet address", "error"); return; }
-    try {
-      const res = await fetch(`${API}/protected/wallet`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-        body: JSON.stringify({ wallet: addr })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        document.getElementById("walletDisplay").textContent = addr;
-        document.getElementById("walletDisplay").classList.add("connected");
-        document.getElementById("walletStatus").textContent = "Connected";
-        animateCount("totalPoints", 0, data.points, 800);
-        renderTasks(data.tasks);
-        showToast("💼 Wallet saved! +50 pts", "success");
-      } else { showToast(data.message, "error"); }
-    } catch { showToast("Network error ❌", "error"); }
-  }
+function copyWallet() {
+  var addr = document.getElementById("walletDisplay").textContent;
+  if (addr === "No wallet connected") return;
+  navigator.clipboard.writeText(addr);
+  showToast("📋 Address copied!", "success");
+}
 
-  function copyWallet() {
-    const addr = document.getElementById("walletDisplay").textContent;
-    if (addr === "No wallet connected") return;
-    navigator.clipboard.writeText(addr);
-    showToast("📋 Address copied!", "success");
-  }
+function copyRefLink() {
+  var link = document.getElementById("refLink").value;
+  navigator.clipboard.writeText(link);
+  showToast("🔗 Referral link copied!", "success");
+}
 
-  function copyRefLink() {
-    const link = document.getElementById("refLink").value;
-    navigator.clipboard.writeText(link);
-    showToast("🔗 Referral link copied!", "success");
-  }
+function logout() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  window.location.href = "login.html";
+}
 
-  function logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "login.html";
-  }
-
-  function showToast(msg, type = "") {
-    const t = document.getElementById("toast");
-    t.textContent = msg;
-    t.className = `toast ${type} show`;
-    setTimeout(() => t.classList.remove("show"), 2500);
-  }
+function showToast(msg, type) {
+  var t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast " + (type || "") + " show";
+  setTimeout(function() { t.classList.remove("show"); }, 2500);
+}
 </script>
 </body>
 </html>
