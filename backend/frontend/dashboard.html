@@ -38,8 +38,7 @@
     .nav-item .badge { margin-left: auto; background: var(--accent3); color: #000; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; font-family: var(--font-mono); }
     .sidebar-bottom { padding: 16px; border-top: 1px solid var(--border); }
     .user-chip { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--card); border-radius: 10px; border: 1px solid var(--border); }
-    .avatar { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #000; flex-shrink: 0; overflow: hidden; }
-    .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+    .avatar { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #000; flex-shrink: 0; }
     .user-info { flex: 1; min-width: 0; }
     .user-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .user-email { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -48,24 +47,24 @@
 
     /* TOPBAR */
     .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
-    .page-title { font-family: var(--font-display); font-size: 28px; letter-spacing: 2px; }
     .topbar-left { display: flex; align-items: center; gap: 12px; }
     .topbar-right { display: flex; align-items: center; gap: 16px; }
+    .page-title { font-family: var(--font-display); font-size: 28px; letter-spacing: 2px; }
     .status-dot { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted2); font-family: var(--font-mono); }
     .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); } }
 
     /* HAMBURGER */
-    .hamburger { display: none; flex-direction: column; justify-content: center; align-items: center; gap: 5px; width: 40px; height: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: border-color 0.2s; }
+    .hamburger { display: none; flex-direction: column; justify-content: center; align-items: center; gap: 5px; width: 40px; height: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: border-color 0.2s; padding: 0; }
     .hamburger:hover { border-color: rgba(200,245,66,0.3); }
     .hamburger span { display: block; width: 18px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.3s ease; }
     .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     .hamburger.open span:nth-child(2) { opacity: 0; }
     .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-    /* SIDEBAR OVERLAY */
-    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 49; opacity: 0; transition: opacity 0.3s ease; }
-    .sidebar-overlay.show { opacity: 1; }
+    /* OVERLAY */
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 49; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+    .sidebar-overlay.show { opacity: 1; pointer-events: all; }
 
     /* MAIN */
     .main { padding: 32px; display: flex; flex-direction: column; gap: 24px; overflow-y: auto; }
@@ -184,50 +183,48 @@
       .bottom-grid { grid-template-columns: 1fr; }
     }
 
-   @media (max-width: 768px) {
-  .app { grid-template-columns: 1fr; }
-  .sidebar {
-    display: flex; position: fixed;
-    left: 0; top: 0; height: 100vh; width: 260px;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    z-index: 50;
-  }
-  .sidebar.open { transform: translateX(0); }
-  .sidebar-overlay { display: block; }
-  .hamburger { display: flex; }
-  .topbar { padding: 0 16px; height: 56px; }
-  .main {
-    padding: 16px;
-    padding-bottom: 160px; /* ✅ increased to clear browser bottom bar */
-    gap: 16px;
-  }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .stat-value { font-size: 28px; }
-  .stat-card { padding: 14px; }
-  .middle-grid { grid-template-columns: 1fr; }
-  .bottom-grid { grid-template-columns: 1fr; }
-  .ref-grid { grid-template-columns: 1fr 1fr; }
-  .ref-code { font-size: 22px; letter-spacing: 2px; }
-  .ref-pts { font-size: 22px; }
-  .wallet-input-wrap { flex-wrap: wrap; }
-  .wallet-input-wrap .btn { flex: 1; }
-  .ref-link-row { flex-direction: column; }
-  .ref-link-row .btn { width: 100%; }
-  .toast { right: 12px; left: 12px; bottom: 80px; }
-}
+    @media (max-width: 768px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar {
+        display: flex !important;
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        height: 100vh !important;
+        width: 260px !important;
+        transform: translateX(-100%) !important;
+        transition: transform 0.3s ease !important;
+        animation: none !important;
+        z-index: 50 !important;
+      }
+      .sidebar.open { transform: translateX(0) !important; }
+      .sidebar-overlay { display: block; }
+      .hamburger { display: flex; }
+      .topbar { padding: 0 16px; height: 56px; }
+      .main { padding: 16px; padding-bottom: 120px; gap: 16px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .stat-value { font-size: 28px; }
+      .stat-card { padding: 14px; }
+      .middle-grid { grid-template-columns: 1fr; }
+      .bottom-grid { grid-template-columns: 1fr; }
+      .ref-grid { grid-template-columns: 1fr 1fr; }
+      .ref-code { font-size: 22px; letter-spacing: 2px; }
+      .ref-pts { font-size: 22px; }
+      .wallet-input-wrap { flex-wrap: wrap; }
+      .ref-link-row { flex-direction: column; }
+      .ref-link-row .btn { width: 100%; }
+      .toast { right: 12px; left: 12px; bottom: 80px; }
+    }
 
-@media (max-width: 480px) {
-  .stats-grid { gap: 8px; }
-  .stat-value { font-size: 24px; }
-  .stat-label { font-size: 10px; }
-  .stat-change { font-size: 10px; }
-  .page-title { font-size: 20px; }
-  .card { padding: 16px; }
-  .card-title { font-size: 16px; }
-  .ref-grid { grid-template-columns: 1fr; }
-  .ref-code { font-size: 28px; }
-}
+    @media (max-width: 480px) {
+      .stats-grid { gap: 8px; }
+      .stat-value { font-size: 24px; }
+      .stat-label { font-size: 10px; }
+      .page-title { font-size: 20px; }
+      .card { padding: 16px; }
+      .card-title { font-size: 16px; }
+      .ref-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -250,15 +247,15 @@
     </div>
     <nav class="nav">
       <div class="nav-label">Main</div>
-      <a class="nav-item active" href="dashboard.html" onclick="closeSidebar()"><span class="icon">⚡</span> Dashboard</a>
-      <a class="nav-item" href="leaderboard.html" onclick="closeSidebar()"><span class="icon">🏆</span> Leaderboard <span class="badge">LIVE</span></a>
-      <a class="nav-item" href="dashboard.html#wallet" onclick="closeSidebar()"><span class="icon">💼</span> Wallet</a>
+      <a class="nav-item active" href="dashboard.html"><span class="icon">⚡</span> Dashboard</a>
+      <a class="nav-item" href="leaderboard.html"><span class="icon">🏆</span> Leaderboard <span class="badge">LIVE</span></a>
+      <a class="nav-item" href="dashboard.html#wallet"><span class="icon">💼</span> Wallet</a>
       <div class="nav-label">Activity</div>
-      <a class="nav-item" href="tasks.html" onclick="closeSidebar()"><span class="icon">✅</span> Tasks</a>
-      <a class="nav-item" href="points-history.html" onclick="closeSidebar()"><span class="icon">📈</span> Points History</a>
+      <a class="nav-item" href="tasks.html"><span class="icon">✅</span> Tasks</a>
+      <a class="nav-item" href="points-history.html"><span class="icon">📈</span> Points History</a>
       <div class="nav-label">Account</div>
-      <a class="nav-item" href="profile.html" onclick="closeSidebar()"><span class="icon">👤</span> Profile</a>
-      <a class="nav-item" href="settings.html" onclick="closeSidebar()"><span class="icon">⚙️</span> Settings</a>
+      <a class="nav-item" href="profile.html"><span class="icon">👤</span> Profile</a>
+      <a class="nav-item" href="settings.html"><span class="icon">⚙️</span> Settings</a>
     </nav>
     <div class="sidebar-bottom">
       <div class="user-chip">
@@ -388,6 +385,7 @@
     document.getElementById("sidebarOverlay").classList.toggle("show");
     document.getElementById("hamburger").classList.toggle("open");
   }
+
   function closeSidebar() {
     document.getElementById("sidebar").classList.remove("open");
     document.getElementById("sidebarOverlay").classList.remove("show");
