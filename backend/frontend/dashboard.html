@@ -36,19 +36,20 @@
       top: 0;
       height: 100vh;
       z-index: 50;
+      overflow-y: auto;
     }
 
     .logo { padding: 0 24px 32px; border-bottom: 1px solid var(--border); }
     .logo-text { font-family: var(--font-display); font-size: 36px; letter-spacing: 4px; color: var(--accent); line-height: 1; }
     .logo-sub { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
-    .nav { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
+    .nav { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
     .nav-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; padding: 0 8px; margin: 12px 0 6px; }
     .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; color: var(--muted2); font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; border: 1px solid transparent; }
     .nav-item:hover { color: var(--text); background: var(--card); }
     .nav-item.active { color: var(--accent); background: rgba(200,245,66,0.08); border-color: rgba(200,245,66,0.15); }
     .nav-item .icon { width: 18px; text-align: center; font-size: 16px; }
     .nav-item .badge { margin-left: auto; background: var(--accent3); color: #000; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; font-family: var(--font-mono); }
-    .sidebar-bottom { padding: 16px; border-top: 1px solid var(--border); }
+    .sidebar-bottom { padding: 16px; border-top: 1px solid var(--border); margin-top: auto; }
     .user-chip { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--card); border-radius: 10px; border: 1px solid var(--border); }
     .avatar { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #000; flex-shrink: 0; }
     .user-info { flex: 1; min-width: 0; }
@@ -67,28 +68,12 @@
     @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); } }
 
     /* ── HAMBURGER ── */
-    .hamburger { display: none; flex-direction: column; justify-content: center; align-items: center; gap: 5px; width: 40px; height: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: border-color 0.2s; padding: 0; }
+    .hamburger { display: none; flex-direction: column; justify-content: center; align-items: center; gap: 5px; width: 40px; height: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: border-color 0.2s; padding: 0; flex-shrink: 0; }
     .hamburger:hover { border-color: rgba(200,245,66,0.3); }
-    .hamburger span { display: block; width: 18px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.3s ease; }
+    .hamburger span { display: block; width: 18px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.3s ease; pointer-events: none; }
     .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     .hamburger.open span:nth-child(2) { opacity: 0; }
     .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-    /* ── OVERLAY — only covers content area, NOT sidebar ── */
-    .sidebar-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 260px; /* starts AFTER the sidebar */
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.7);
-      z-index: 45;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
-    }
-    .sidebar-overlay.show { opacity: 1; pointer-events: all; }
 
     /* ── MAIN ── */
     .main { padding: 32px; display: flex; flex-direction: column; gap: 24px; overflow-y: auto; }
@@ -200,6 +185,20 @@
     .toast.success { border-color: rgba(200,245,66,0.3); }
     .toast.error { border-color: rgba(250,109,109,0.3); }
 
+    /* ── MOBILE DRAWER (no overlay conflict) ── */
+    .drawer-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 98;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .drawer-backdrop.show {
+      opacity: 1;
+    }
+
     /* ===== RESPONSIVE ===== */
     @media (max-width: 1100px) {
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
@@ -210,30 +209,27 @@
     @media (max-width: 768px) {
       .app { grid-template-columns: 1fr; }
 
-      /* Sidebar hidden off-screen by default */
       .sidebar {
         position: fixed !important;
-        left: 0 !important;
         top: 0 !important;
+        left: 0 !important;
+        width: 280px !important;
         height: 100vh !important;
-        width: 260px !important;
         transform: translateX(-100%) !important;
-        transition: transform 0.3s ease !important;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         animation: none !important;
-        z-index: 100 !important;
+        z-index: 999 !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior: contain !important;
       }
 
-      /* Sidebar visible when open */
       .sidebar.open {
         transform: translateX(0) !important;
+        box-shadow: 4px 0 24px rgba(0,0,0,0.5) !important;
       }
 
-      /* Overlay covers full screen when sidebar opens */
-      .sidebar-overlay {
-        display: block;
-        left: 0 !important; /* cover full screen on mobile */
-      }
-
+      .drawer-backdrop { display: block; z-index: 998; }
       .hamburger { display: flex; }
       .topbar { padding: 0 16px; height: 56px; }
       .main { padding: 16px; padding-bottom: 120px; gap: 16px; }
@@ -273,8 +269,8 @@
 <div class="bg-glow"></div>
 <div class="toast" id="toast"></div>
 
-<!-- Overlay: tapping this closes the sidebar -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<!-- Backdrop: clicking it closes the sidebar -->
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
 
 <div class="app">
   <aside class="sidebar" id="sidebar">
@@ -417,29 +413,44 @@
 </div>
 
 <script>
-  function toggleSidebar() {
-    const sidebar   = document.getElementById("sidebar");
-    const overlay   = document.getElementById("sidebarOverlay");
-    const hamburger = document.getElementById("hamburger");
-    const isOpen    = sidebar.classList.contains("open");
+  // ── DRAWER (sidebar) ──────────────────────────────────────────
+  const sidebar   = document.getElementById("sidebar");
+  const backdrop  = document.getElementById("drawerBackdrop");
+  const hamburger = document.getElementById("hamburger");
 
-    if (isOpen) {
-      sidebar.classList.remove("open");
-      overlay.classList.remove("show");
-      hamburger.classList.remove("open");
-    } else {
-      sidebar.classList.add("open");
-      overlay.classList.add("show");
-      hamburger.classList.add("open");
-    }
+  function toggleSidebar() {
+    const open = sidebar.classList.toggle("open");
+    hamburger.classList.toggle("open", open);
+    backdrop.classList.toggle("show", open);
+    // prevent body scroll when sidebar is open
+    document.body.style.overflow = open ? "hidden" : "";
   }
 
   function closeSidebar() {
-    document.getElementById("sidebar").classList.remove("open");
-    document.getElementById("sidebarOverlay").classList.remove("show");
-    document.getElementById("hamburger").classList.remove("open");
+    sidebar.classList.remove("open");
+    hamburger.classList.remove("open");
+    backdrop.classList.remove("show");
+    document.body.style.overflow = "";
   }
 
+  // Close on backdrop tap
+  backdrop.addEventListener("click", closeSidebar);
+
+  // Close when a nav link is tapped
+  sidebar.querySelectorAll(".nav-item").forEach(link => {
+    link.addEventListener("click", () => {
+      if (window.innerWidth <= 768) closeSidebar();
+    });
+  });
+
+  // Swipe left to close
+  let touchStartX = 0;
+  sidebar.addEventListener("touchstart", e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  sidebar.addEventListener("touchend", e => {
+    if (touchStartX - e.changedTouches[0].clientX > 60) closeSidebar();
+  }, { passive: true });
+
+  // ── APP ───────────────────────────────────────────────────────
   const API   = "https://zestful-wisdom-production-c5b7.up.railway.app/api";
   const token = localStorage.getItem("token");
 
